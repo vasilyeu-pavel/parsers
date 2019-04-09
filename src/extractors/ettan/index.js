@@ -1,7 +1,8 @@
 const puppeteer = require('puppeteer');
 
-const { auth, getAuthOptions, getMatchList } = require('../../helpers/utils');
-const chunkArray = require('../../helpers/chunkArray');
+const { getAuthOptions, getMatchList } = require('./requestHelpers');
+const { auth } = require('../../utils');
+const chunkArray = require('../../utils/chunkArray');
 const config = require('../../../config');
 const { runCmdHandler } = require('../../downloader');
 
@@ -16,7 +17,7 @@ const downloader = async matchList => {
     }
 };
 
-const parser = async (name, limit) => {
+const parser = async (name, limit, day) => {
     const url = config[name].url;
     const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: true });
     const page = await browser.newPage();
@@ -28,7 +29,7 @@ const parser = async (name, limit) => {
 
     const authOptions = await getAuthOptions(page);
 
-    const matchList = await getMatchList(authOptions, name, limit);
+    const matchList = await getMatchList(authOptions, name, limit, day);
 
     await browser.close();
 
