@@ -41,7 +41,7 @@ const getAuthOptions = async page => {
 
 const getPrevDay = () => {
     const prevDate = new Date();
-    prevDate.setDate(prevDate.getDate() - 1);
+    prevDate.setDate(prevDate.getDate() - 3);
     return prevDate;
 };
 
@@ -61,6 +61,5 @@ const getMatchList = async (authOptions, parserName, limit) => {
 
     return matches.filter(filterByDay);
 };
-
 
 module.exports = { auth, getAuthOptions, getMatchList };

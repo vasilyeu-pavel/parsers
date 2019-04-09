@@ -12,7 +12,7 @@ const spawnWindowsProcess = (dir, cmd) => {
 
 const spawnLinuxProcess = (dir, cmd) => {
   const cmdParts = cmd.split(/\s+/);
-  return spawn(cmdParts[0], cmdParts.slice(1), { cwd: dir});
+  return spawn(cmdParts[0], cmdParts.slice(1), { cwd: dir });
 };
 
 const runCmdHandler = (dir, cmd) => {

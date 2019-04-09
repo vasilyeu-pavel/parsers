@@ -1,7 +1,8 @@
 const { start, parser } = require('./src/extractors/ettan');
 
 const parsers = async () => {
-    await parser('ettan', 100);
+    const matches = await parser('ettan', 100);
+    await start(matches);
 };
 
 parsers();

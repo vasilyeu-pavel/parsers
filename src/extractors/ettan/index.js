@@ -1,26 +1,18 @@
 const puppeteer = require('puppeteer');
 const { auth, getAuthOptions, getMatchList } = require('../../helpers/utils');
+const chunkArray = require('../../helpers/chunkArray');
 const config = require('../../../config');
 const { runCmdHandler } = require('../../downloader');
 
-const downloader = (arrLinks, count) => {
-    let result = [];
-    for (var i = 0; i < arrLinks.length; i++) {
-        let link = `youtube-dl stor-2.staylive.se/seodiv/${arrLinks[i].ID}/720/720.m3u8 --output ${arrLinks[i].ID}.mp4`;
-        result.push(runCmdHandler('./youtube-dl', link))
-    }
-    return Promise.all(result)
-};
-
-const filterForDate = (arr, dayAgo) => {
-    let newDate = new Date(new Date - (86400 * 1000) * dayAgo);
-
-    return arr.filter((el) => new Date(el.date) >= newDate.getDate());
-};
+const downloader = matchList =>
+    Promise.all(matchList.map(({ ID }) =>
+        runCmdHandler(
+            './youtube-dl',
+            `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${ID}.mp4`)
+    ));
 
 const start = async matchList => {
-    let filteredByDate = filterForDate(matchList, 9);
-    let chunkMatches = chunkArray(filteredByDate, 3);
+    let chunkMatches = chunkArray(matchList, 3);
     for (var i = 0; i < chunkMatches.length; i++) {
         await downloader(chunkMatches[i], i)
     }
@@ -40,9 +32,9 @@ const parser = async (name, limit) => {
 
     const matchList = await getMatchList(authOptions, name, limit);
 
-    console.log(matchList);
-
     await browser.close();
+
+    return matchList;
 };
 
 module.exports = {
