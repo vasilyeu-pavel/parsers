@@ -10,7 +10,7 @@ const downloader = async matchList => {
     for (var i = 0; i < chunkMatches.length; i++) {
         await Promise.all(chunkMatches[i].map(({ ID }) =>
             runCmdHandler(
-                './youtube-dl',
+                './src/youtube-dl',
                 `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${ID}.mp4`)
         ));
     }
