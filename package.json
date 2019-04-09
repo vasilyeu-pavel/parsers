@@ -10,14 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
     "chalk": "^2.4.2",
     "figlet": "^1.2.1",
     "inquirer": "^6.2.2",
     "inquirer-datepicker-prompt": "^0.4.2",
     "node-fetch": "^2.3.0",
-    "puppeteer": "^1.14.0",
-    "youtube-dl": "^1.11.1"
+    "puppeteer": "^1.14.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0"

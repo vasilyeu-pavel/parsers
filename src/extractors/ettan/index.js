@@ -3,16 +3,17 @@ const puppeteer = require('puppeteer');
 const { getAuthOptions, getMatchList } = require('./requestHelpers');
 const { auth } = require('../../utils');
 const chunkArray = require('../../utils/chunkArray');
+const formatDate = require('../../utils/formatDate');
 const config = require('../../../config');
 const { runCmdHandler } = require('../../downloader');
 
-const downloader = async matchList => {
+const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 3);
     for (var i = 0; i < chunkMatches.length; i++) {
-        await Promise.all(chunkMatches[i].map(({ ID }) =>
+        await Promise.all(chunkMatches[i].map(({ ID, name, date }) =>
             runCmdHandler(
                 './src/youtube-dl',
-                `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${ID}.mp4`)
+                `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
         ));
     }
 };
