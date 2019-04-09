@@ -1,20 +1,18 @@
 const puppeteer = require('puppeteer');
+
 const { auth, getAuthOptions, getMatchList } = require('../../helpers/utils');
 const chunkArray = require('../../helpers/chunkArray');
 const config = require('../../../config');
 const { runCmdHandler } = require('../../downloader');
 
-const downloader = matchList =>
-    Promise.all(matchList.map(({ ID }) =>
-        runCmdHandler(
-            './youtube-dl',
-            `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${ID}.mp4`)
-    ));
-
-const start = async matchList => {
-    let chunkMatches = chunkArray(matchList, 3);
+const downloader = async matchList => {
+    const chunkMatches = chunkArray(matchList, 3);
     for (var i = 0; i < chunkMatches.length; i++) {
-        await downloader(chunkMatches[i], i)
+        await Promise.all(chunkMatches[i].map(({ ID }) =>
+            runCmdHandler(
+                './youtube-dl',
+                `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${ID}.mp4`)
+        ));
     }
 };
 
@@ -38,5 +36,5 @@ const parser = async (name, limit) => {
 };
 
 module.exports = {
-    start, parser
+    downloader, parser
 };
