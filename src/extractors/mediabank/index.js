@@ -3,6 +3,7 @@ const { auth, getPage, getCookies } = require('../../utils');
 const { cookiesParser, getMatchList } = require('./helpers');
 const { runCmdHandler } = require('../../downloader');
 const { sendTelegramMessage } = require('../../telegramBot');
+const chunkArray = require('../../utils/chunkArray');
 
 const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 5);
