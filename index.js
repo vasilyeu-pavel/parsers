@@ -9,8 +9,9 @@ const startScraping = async (browser, parserName, day) => {
     const { downloader, parser } = require(`./src/extractors/${parserName}`);
 
     const matches = await parser(browser, parserName, 100, day);
+
     if (!matches.length) return;
-    // await downloader(matches, parserName);
+    await downloader(matches, parserName);
 };
 
 const parsers = async () => {
@@ -18,8 +19,9 @@ const parsers = async () => {
     if (error) console.log(chalk.red(error.message));
 
     try {
-        const {day, parsersList} = await getQuestions();
-        const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: false });
+        const { day, parsersList } = await getQuestions();
+        const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: true });
+
         await Promise.all(parsersList.map(parserName => startScraping(browser, parserName, day)));
         error = null;
         await browser.close();

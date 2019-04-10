@@ -1,4 +1,6 @@
 const fetch = require('node-fetch');
+const FormData = require('form-data');
+const formatDate = require('../../utils/formatDate');
 
 const cookiesParser = coockies => {
     const arrFiltered = coockies.filter((el) => el.name === '_ga' || el.name === '__zlcmid' || el.name === 'Mediabank_' || el.name === 'server-id' );
@@ -12,27 +14,72 @@ const cookiesParser = coockies => {
     return str;
 };
 
-const getMatchList = async (cookies, name) => {
-    const options = {
-        'Content-Length': '300',
-        'Cookie': cookies,
-    };
+const getFormData = form => {
+    form.append('offset', '0');
+    form.append('limit', '300');
+    form.append('page', '1');
+    form.append('sortorder', '');
+    form.append('orderBy', '');
+    form.append('search', '');
+    form.append('smartsearchmatchtype', 'all');
+    form.append('smartsearchperiod', '');
+    form.append('smartsearchperiodtype', 'hours');
+    form.append('smartsearchassetcreatedfiltertype', 'before');
+    form.append('application', 'library');
+    form.append('smartsearchperiodenabled', 'false');
+    form.append('smartsearchassetcreatedfilterenabled', 'false');
 
-    const res = await fetch('https://www.mediabank.me/ajax/advanced_search.php', {
-        headers: options,
-        body: JSON.stringify({
-            offset: 0,
-            limit: 64,
-            page: 1,
-            sortorder: '',
-            orderBy: '',
-            application: 'library'
-        })
-    });
+    return form;
+};
 
-    const parsedRes = await res.json();
+const getMatchList = async (cookies, name, day) => {
+    const form = new FormData();
+    try {
 
-    console.log(parsedRes)
+        const res = await fetch('https://www.mediabank.me/ajax/advanced_search.php', {
+            method: 'POST',
+            headers: {
+                Cookie: cookies,
+            },
+            body: getFormData(form),
+        });
+
+        const { data: { assets } } = await res.json();
+        const filteredMatches = assets
+            .filter(({ assetmeta }) => assetmeta.SubTitle !== null)
+            .filter(({ assettitle, assetmeta }) =>
+                // filter for Tippeligaen && OBOS
+                (assettitle.includes('Half')
+                && assetmeta.Season === '2019'
+                && assetmeta.EventDate === formatDate(day))
+                // ||
+                // filter for 2-3 divisions
+                // assetmeta.SubTitle.includes('Match')
+                //     && assetmeta.Season === '2019'
+                //     && assetmeta.EventDate === formatDate(day)
+            ).map(({ assetmeta }) => ({
+                id: assetmeta.Id,
+                name: assetmeta.Title.replace(/ /g,''),
+                date: assetmeta.EventDate,
+                league: assetmeta.League,
+            }));
+
+        return await Promise.all(filteredMatches.map(async match => {
+                const { id  } = match;
+
+                const res = await fetch(`https://www.mediabank.me/download/?method=proxy_play&assetid=${id}&lang=`, {
+                    method: 'GET',
+                    headers: { Cookie: cookies },
+                });
+
+                return {
+                    ...match,
+                    url: res.url,
+                };
+        }));
+    } catch (e) {
+        throw new Error(`Ошибка в запросе к медиабанку ${e.message}`);
+    }
 };
 
 module.exports = {

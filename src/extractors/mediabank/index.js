@@ -1,9 +1,22 @@
 const config = require('../../../config');
 const { auth, getPage, getCookies } = require('../../utils');
 const { cookiesParser, getMatchList } = require('./helpers');
+const { runCmdHandler } = require('../../downloader');
+const { sendTelegramMessage } = require('../../telegramBot');
 
-const downloader = () => {
-
+const downloader = async (matchList, parserName) => {
+    const chunkMatches = chunkArray(matchList, 5);
+    for (let i = 0; i < chunkMatches.length; i++) {
+        await Promise.all(chunkMatches[i].map(({ ID, name, date, url, league }) =>
+            runCmdHandler(
+                './src/youtube-dl',
+                `youtube-dl ${url} --output ${parserName}/${league}/${date}_${name}.mp4`)
+        ));
+        sendTelegramMessage({
+            league: chunkMatches[i][0].league,
+            matches: chunkMatches[i].map(({ name, date }) => `${date}_${name}`)
+        });
+    }
 };
 
 const parser = async (browser, name, limit, day) => {
@@ -19,9 +32,11 @@ const parser = async (browser, name, limit, day) => {
 
     const parsedCookies = cookiesParser(cookies);
 
-    await getMatchList(parsedCookies, name);
-
     await page.close();
+
+    const matchList = await getMatchList(parsedCookies, name, day);
+
+    return matchList;
 };
 
 module.exports = {

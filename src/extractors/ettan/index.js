@@ -7,15 +7,15 @@ const { runCmdHandler } = require('../../downloader');
 const { sendTelegramMessage } = require('../../telegramBot');
 
 const downloader = async (matchList, parserName) => {
-    const chunkMatches = chunkArray(matchList, 3);
-    for (var i = 0; i < chunkMatches.length; i++) {
+    const chunkMatches = chunkArray(matchList, 5);
+    for (let i = 0; i < chunkMatches.length; i++) {
         await Promise.all(chunkMatches[i].map(({ ID, name, date }) =>
             runCmdHandler(
                 './src/youtube-dl',
                 `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
         ));
         sendTelegramMessage({
-            ligue: parserName,
+            league: parserName,
             matches: chunkMatches[i].map(({ name, date }) => `${date}_${name}`)
         });
     }
