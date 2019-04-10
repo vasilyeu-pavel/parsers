@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const formatDate = require('../../utils/formatDate');
 const config = require('../../../config');
-const { getCoockies } = require('../../utils');
+const { getCookies } = require('../../utils');
 
 const parsedCoockies = coockies => {
     const result = {};
@@ -17,9 +17,9 @@ const parsedCoockies = coockies => {
 };
 
 const getAuthOptions = async page => {
-    const coockies = await getCoockies(page);
+    const cookies = await getCookies(page);
 
-    return parsedCoockies(coockies);
+    return parsedCoockies(cookies);
 };
 
 const filterByDay = (day, { date, duration }) =>

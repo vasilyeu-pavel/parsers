@@ -1,11 +1,10 @@
-const puppeteer = require('puppeteer');
-
-const { getAuthOptions, getMatchList } = require('./requestHelpers');
-const { auth } = require('../../utils');
+const { getAuthOptions, getMatchList } = require('./helpers');
+const { auth, getPage } = require('../../utils');
 const chunkArray = require('../../utils/chunkArray');
 const formatDate = require('../../utils/formatDate');
 const config = require('../../../config');
 const { runCmdHandler } = require('../../downloader');
+const { sendTelegramMessage } = require('../../telegramBot');
 
 const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 3);
@@ -15,14 +14,17 @@ const downloader = async (matchList, parserName) => {
                 './src/youtube-dl',
                 `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
         ));
+        sendTelegramMessage({
+            ligue: parserName,
+            matches: chunkMatches[i].map(({ name, date }) => `${date}_${name}`)
+        });
     }
 };
 
-const parser = async (name, limit, day) => {
+const parser = async (browser, name, limit, day) => {
     const url = config[name].url;
-    const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: true });
-    const page = await browser.newPage();
-    await page.goto(url);
+
+    const page = await getPage(browser, url);
 
     await auth(page, name);
 
@@ -32,7 +34,7 @@ const parser = async (name, limit, day) => {
 
     const matchList = await getMatchList(authOptions, name, limit, day);
 
-    await browser.close();
+    await page.close();
 
     return matchList;
 };
