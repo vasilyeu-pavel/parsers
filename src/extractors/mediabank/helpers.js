@@ -57,7 +57,7 @@ const getMatchList = async (cookies, name, day) => {
                 id: assetmeta.Id,
                 name: assetmeta.Title.replace(/ /g,'').replace(/\//g,''),
                 date: assetmeta.EventDate,
-                league: assetmeta.League,
+                league: assetmeta.League.replace(/ /g,''),
             }));
 
         return await Promise.all(filteredMatches.map(async match => {
