@@ -16,6 +16,8 @@
     "form-data": "^2.3.3",
     "inquirer": "^6.2.2",
     "inquirer-datepicker-prompt": "^0.4.2",
+    "jsdom": "^14.0.0",
+    "moment-timezone": "^0.5.23",
     "node-fetch": "^2.3.0",
     "node-telegram-bot-api": "^0.30.0",
     "puppeteer": "^1.14.0"

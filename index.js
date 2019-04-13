@@ -28,7 +28,7 @@ const parsers = async () => {
     } catch (e) {
         error = e;
     } finally {
-      parsers()
+      // parsers()
     }
 };
 
