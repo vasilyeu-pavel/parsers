@@ -49,17 +49,13 @@ const getMatchList = async (cookies, name, day) => {
             .filter(({ assetmeta }) => assetmeta.SubTitle !== null)
             .filter(({ assettitle, assetmeta }) =>
                 // filter for Tippeligaen && OBOS
-                (assettitle.includes('Half')
+                (assettitle.includes('Half') || assettitle.includes('Full match'))
                 && assetmeta.Season === '2019'
-                && assetmeta.EventDate === formatDate(day))
-                // ||
-                // filter for 2-3 divisions
-                // assetmeta.SubTitle.includes('Match')
-                //     && assetmeta.Season === '2019'
-                //     && assetmeta.EventDate === formatDate(day)
+                && assetmeta.EventDate === formatDate(day)
+                && assetmeta.FileStatus.toLowerCase() === 'ready'
             ).map(({ assetmeta }) => ({
                 id: assetmeta.Id,
-                name: assetmeta.Title.replace(/ /g,''),
+                name: assetmeta.Title.replace(/ /g,'').replace(/\//g,''),
                 date: assetmeta.EventDate,
                 league: assetmeta.League,
             }));

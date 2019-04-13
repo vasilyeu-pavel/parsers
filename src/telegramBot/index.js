@@ -8,7 +8,7 @@ const createMessage = ({ league, matches }) =>
     ${matches.map((match, i) => `<strong>${++i})</strong> ${match}`)}`;
 
 const sendTelegramMessage = message => {
-    bot.sendMessage(config['telegram'].chatId, createMessage(message), {parse_mode: "HTML"});
+    bot.sendMessage(config['telegram'].chatId, createMessage(message), { parse_mode: "HTML" });
 };
 
 module.exports = { sendTelegramMessage };
