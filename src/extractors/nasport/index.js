@@ -87,7 +87,7 @@ const downloader = async (urls, parserName) => {
     for(const chunkUrls of urls) {
         await Promise.all(chunkUrls.map(url => console.log(`youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`) ||
             runCmdHandler(
-                './youtube-dl',
+                './src/youtube-dl',
                 `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`)
         ));
         sendTelegramMessage({
