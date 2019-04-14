@@ -2,42 +2,33 @@ const fetch = require('node-fetch');
 const moment = require('moment-timezone');
 const jsdom = require('jsdom');
 
+const formatDate = require('../../utils/formatDate');
 const chunkArray = require('../../utils/chunkArray');
 const config = require('../../../config');
 
-const dataSports = [
-    /* {
-         id: '24649df6-3225-49ff-b9cb-ba3100d43db6',
-         name: 'basket'
-     },
-     {
-         id: '52aa1912-2e88-4fdb-bf82-76719f91c53c',
-         name: 'handball',
-     },
-     {
-             id: '01371b25-75da-4587-a347-ad3bf0e63971',
-             name: 'hockey'
-         }, */
-     {
-         id: 'a1da5593-7bc1-4c70-92da-19e5953a1f9b',
-         name: 'football'
-     }
-];
+const { runCmdHandler } = require('../../downloader');
+const { sendTelegramMessage } = require('../../telegramBot');
 
 const getEventList = async (id, day) => {
     const res = await fetch(`https://services.api.no/api/hjallis/v2/front?sport=${id}`);
     const { entities: { events } } = await res.json();
-
     if (!events || !Object.values(events).length) return;
 
-    return Object.values(events)
+    const eventList = Object.values(events)
         .filter((event) => moment(event.timespan.start).format("YYYY-MM-DD") === moment(day).format("YYYY-MM-DD"))
-        .map(event => console.log(event) || ({
-            name: event.title.trim().replace(/\s/g, ""),
-            start: moment(event.timespan.start).format('YYYY-MM-DD'),
-            id: event._id,
-            sport: event.sport.name,
-        }));
+        .filter(event => event.game)
+        .map( event => {
+            return {
+                name: event.title.trim().replace(/\s/g, ""),
+                start: moment(event.timespan.start).format('YYYY-MM-DD'),
+                id: event._id,
+                sport: event.sport.name,
+                league: config['nasport'].sports[0].leagues[event.game.league._id] && config['nasport'].sports[0].leagues[event.game.league._id].replace(/\s/g, "").replace(/\-/g, ""),
+            };
+        })
+        .filter(({ league }) => league);
+
+    return eventList;
 };
 
 const getVideoId = async (eventId) => {
@@ -78,38 +69,43 @@ const getLinkIds = (videoIds) => new Promise(resolve => {
     }))).then(res => resolve(res))
 });
 
-// ID, name, date, url, league
 const getUrls = async (id, day) => {
     const eventList = await getEventList(id, day);
     const videoIds = await getVideoIds(eventList);
 
     const events = await getLinkIds(videoIds.filter(videoId => Object.keys(videoId).length));
-    return chunkArray(events.map(({ linkId, start, name }) => ({
+    return chunkArray(events.map(({ linkId, start, name, league }) => ({
         url: `https://lw-amedia-cf.lwcdn.com/hls/${linkId}/playlist.m3u8`,
         name: name,
         date: start,
-        ID: linkId
+        ID: linkId,
+        league,
     })), 5);
 };
 
-const downloader = async (urls, sport) =>
-    await Promise.all(urls.map(url =>
-        runCmdHandler('./youtube-dl', `youtube-dl ${url.url} --output ${sport}/${url.name}.mp4`)
-    ));
+const downloader = async (urls, parserName) => {
+    for(const chunkUrls of urls) {
+        await Promise.all(chunkUrls.map(url => console.log(`youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`) ||
+            runCmdHandler(
+                './youtube-dl',
+                `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`)
+        ));
+        sendTelegramMessage({
+            league: parserName,
+            matches: chunkUrls.map(({ name, date, league }) => `${date}_${name}(${league})`)
+        });
+    }
+};
 
 const controller = async ({ id, name }, day) => {
-    const urls = await getUrls(id, day);
-    // console.log(urls)
-    // for(const chunkUrls of urls) {
-    //     await downloader(chunkUrls, name);
-    // }
+    return await getUrls(id, day);
 };
 
 const parser = async (browser, name, limit, day) => {
     const sports = config[name].sports;
 
     for(const sport of sports) {
-        await controller(sport, day);
+        return await controller(sport, day);
     }
 };
 

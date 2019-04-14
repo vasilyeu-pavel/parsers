@@ -11,7 +11,7 @@ const downloader = async (matchList, parserName) => {
         await Promise.all(chunkMatches[i].map(({ ID, name, date, url, league }) =>
             runCmdHandler(
                 './src/youtube-dl',
-                `youtube-dl ${url} --output ${parserName}/${league}/${date}_${name}.mp4`)
+                `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${league}/${date}_${name}.mp4`)
         ));
         sendTelegramMessage({
             league: chunkMatches[i][0].league,

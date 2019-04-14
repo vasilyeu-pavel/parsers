@@ -12,7 +12,7 @@ const downloader = async (matchList, parserName) => {
         await Promise.all(chunkMatches[i].map(({ ID, name, date }) =>
             runCmdHandler(
                 './src/youtube-dl',
-                `youtube-dl stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
+                `youtube-dl --hls-prefer-native stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
         ));
         sendTelegramMessage({
             league: parserName,
