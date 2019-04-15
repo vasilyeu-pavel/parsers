@@ -80,12 +80,12 @@ const getUrls = async (id, day) => {
         date: start,
         ID: linkId,
         league,
-    })), 5);
+    })), 10);
 };
 
 const downloader = async (urls, parserName) => {
     for(const chunkUrls of urls) {
-        await Promise.all(chunkUrls.map(url => console.log(`youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`) ||
+        await Promise.all(chunkUrls.map(url =>
             runCmdHandler(
                 './src/youtube-dl',
                 `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`)

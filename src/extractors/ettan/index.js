@@ -7,7 +7,7 @@ const { runCmdHandler } = require('../../downloader');
 const { sendTelegramMessage } = require('../../telegramBot');
 
 const downloader = async (matchList, parserName) => {
-    const chunkMatches = chunkArray(matchList, 5);
+    const chunkMatches = chunkArray(matchList, 7);
     for (let i = 0; i < chunkMatches.length; i++) {
         await Promise.all(chunkMatches[i].map(({ ID, name, date }) =>
             runCmdHandler(

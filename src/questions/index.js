@@ -15,6 +15,57 @@ const getCheckBoxQuestions = dirs => dirs.map((dir, i) => {
         }
     });
 
+const validateName = (name) => name !== '';
+
+const validateUrl = (name) => name !== '' && name.includes('.');
+
+const questionsForDownloadSimpleMatch = async () => {
+    const questions = [
+        {
+            message: "Что будем скачивать(ссылка)?",
+            type: "input",
+            name: "url",
+            validate: validateUrl
+        },
+        {
+            message: "Под каким названием сохранить файл?",
+            type: "input",
+            name: "name",
+            validate: validateName
+        },
+        {
+            message: "Дополнительные опции для ydl (--hls-prefer-native) - перечисление через пробел",
+            type: "input",
+            name: "options",
+        }
+    ];
+
+    return inquirer.prompt(questions);
+};
+
+const selectMode = async () => {
+    const questions = [
+        {
+            type: 'list',
+            message: 'Что вы хотите сделать :) ?',
+            name: 'choice',
+            choices: [
+                {
+                    name: 'Использовать парсеры',
+                },
+                {
+                    name: 'Скачать матч ydl',
+                },
+                {
+                    name: 'Выход!'
+                }
+            ],
+        },
+    ];
+
+    return inquirer.prompt(questions);
+};
+
 const getQuestions = async () => {
     const dirs = await getDirs('./src/extractors');
 
@@ -52,5 +103,5 @@ const getQuestions = async () => {
 };
 
 module.exports = {
-    getQuestions
+    getQuestions, selectMode, questionsForDownloadSimpleMatch
 };

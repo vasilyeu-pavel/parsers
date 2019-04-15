@@ -49,7 +49,9 @@ const getMatchList = async (cookies, name, day) => {
             .filter(({ assetmeta }) => assetmeta.SubTitle !== null)
             .filter(({ assettitle, assetmeta }) =>
                 // filter for Tippeligaen && OBOS
-                (assettitle.includes('Half') || assettitle.includes('Full match'))
+                (assettitle.includes('Half')
+                    // for 2 and 3 norway leagues
+                    // || assettitle.includes('Full match'))
                 && assetmeta.Season === '2019'
                 && assetmeta.EventDate === formatDate(day)
                 && assetmeta.FileStatus.toLowerCase() === 'ready'
