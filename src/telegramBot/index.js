@@ -7,7 +7,7 @@ const config = {
 
 const createMessage = ({ league, matches }) =>
     `[#Скачались матчи] *(${league})*:
-${matches.map(({ name, date }, i) => `\n${i + 1}) *${date}_${name}*`)}
+${matches.map(({ name, date }, i) => `\n${i + 1}) *${date}_${name.replace(/ /g,'')}*`)}
         }`;
 
 const sendTelegramMessage = message => new Promise((resolve, reject) => {
