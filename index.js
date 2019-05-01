@@ -1,7 +1,9 @@
 const puppeteer = require('puppeteer');
 const chalk = require("chalk");
 const { printHeader } = require('./src/utils/printHeader');
+const chunkArray = require('./src/utils/chunkArray');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
+const { customsData } = require('./src/customsData');
 
 let error = null;
 
@@ -16,7 +18,7 @@ const startScraping = async (browser, parserName, day) => {
 
 const parsers = async () => {
     printHeader();
-    if (error) console.log(chalk.red(error.message));
+    if (error) console.log(error);
 
     try {
         const { choice } = await selectMode();
@@ -25,17 +27,27 @@ const parsers = async () => {
                 const { day, parsersList } = await getQuestions();
                 const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: true });
 
-                await Promise.all(parsersList.map(parserName => startScraping(browser, parserName, day)));
+                const result = await Promise.all(parsersList.map(parserName => startScraping(browser, parserName, day)));
                 error = null;
                 await browser.close();
-                break;
+                return result;
             }
             case 'Скачать матч ydl': {
                 const { downloader } = require('./src/downloadSimpleMatch');
                 console.log('Скачать матч ydl');
                 const { url, name, options } = await questionsForDownloadSimpleMatch();
-                await downloader({ url, name, options });
-                break;
+                return await downloader({ url, name, options });
+            }
+            case 'Скачать матчи из файла': {
+                const { downloader } = require('./src/downloadSimpleMatch');
+                console.log('Скачать матчи из файла');
+                const chunkMatches = chunkArray(customsData(), 5);
+
+                for(const chunkUrls of chunkMatches) {
+                    await Promise.all(chunkUrls.map(({ id, url }) =>
+                        downloader({ url, name: `${id}`, options: '--hls-prefer-native' })));
+                }
+                return;
             }
             case 'Выход!': {
                 console.log('Выход!');
@@ -44,7 +56,7 @@ const parsers = async () => {
         }
     } catch (e) {
         error = e;
-        console.log(chalk.red(error.message));
+        console.log(error);
     }
 };
 

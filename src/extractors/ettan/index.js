@@ -16,7 +16,7 @@ const downloader = async (matchList, parserName) => {
         ));
         sendTelegramMessage({
             league: parserName,
-            matches: chunkMatches[i].map(({ name, date }) => `${date}_${name}`)
+            matches: chunkMatches[i],
         });
     }
 };

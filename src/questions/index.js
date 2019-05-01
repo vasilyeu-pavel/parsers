@@ -57,6 +57,9 @@ const selectMode = async () => {
                     name: 'Скачать матч ydl',
                 },
                 {
+                    name: 'Скачать матчи из файла'
+                },
+                {
                     name: 'Выход!'
                 }
             ],

@@ -92,7 +92,7 @@ const downloader = async (urls, parserName) => {
         ));
         sendTelegramMessage({
             league: parserName,
-            matches: chunkUrls.map(({ name, date, league }) => `${date}_${name}(${league})`)
+            matches: chunkUrls,
         });
     }
 };
