@@ -13,7 +13,7 @@ const downloader = async (matchList, parserName) => {
                 './src/youtube-dl',
                 `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${league}/${date}_${name}.mp4`)
         ));
-        sendTelegramMessage({
+        await sendTelegramMessage({
             league: chunkMatches[i][0].league,
             matches: chunkMatches[i],
         });

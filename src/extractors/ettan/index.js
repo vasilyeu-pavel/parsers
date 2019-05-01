@@ -14,7 +14,7 @@ const downloader = async (matchList, parserName) => {
                 './src/youtube-dl',
                 `youtube-dl --hls-prefer-native stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
         ));
-        sendTelegramMessage({
+        await sendTelegramMessage({
             league: parserName,
             matches: chunkMatches[i],
         });
