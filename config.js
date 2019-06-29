@@ -34,6 +34,7 @@ module.exports = {
                     'RvmHrK7OP37V4RvsqbAPhq': 'Norsk Tipping-ligaen avd 5',
                     'gdSF56f4V4RqrRcnWVaoUP': 'Norsk Tipping-ligaen avd 4',
                     'HXxyrXcCJqTr9Q2ghyCaf7': 'PostNord-ligaen avd 2',
+                    'a7dc949b-b491-49bb-9b02-c3732a843573': 'FOTBALL NM MENN',
                 },
             },
         ]

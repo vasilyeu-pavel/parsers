@@ -45,13 +45,13 @@ const getMatchList = async (cookies, name, day) => {
         });
 
         const { data: { assets } } = await res.json();
+
         const filteredMatches = assets
             .filter(({ assetmeta }) => assetmeta.SubTitle !== null)
             .filter(({ assettitle, assetmeta }) => assettitle.includes('Half') 
-                && assetmeta.Season === '2019' 
                 && assetmeta.EventDate === formatDate(day) 
                 && assetmeta.FileStatus.toLowerCase() === 'ready')
-            .map(({ assetmeta }) => ({
+            .map(({ assetmeta, ...props }) => console.log(props) || ({
                 id: assetmeta.Id,
                 name: assetmeta.Title.replace(/ /g,'').replace(/\//g,''),
                 date: assetmeta.EventDate,

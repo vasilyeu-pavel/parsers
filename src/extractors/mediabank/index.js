@@ -34,7 +34,7 @@ const parser = async (browser, name, limit, day) => {
     const parsedCookies = cookiesParser(cookies);
 
     await page.close();
-
+    
     const matchList = await getMatchList(parsedCookies, name, day);
 
     return matchList;

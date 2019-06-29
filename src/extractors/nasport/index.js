@@ -16,8 +16,8 @@ const getEventList = async (id, day) => {
 
     const eventList = Object.values(events)
         .filter((event) => moment(event.timespan.start).format("YYYY-MM-DD") === moment(day).format("YYYY-MM-DD"))
-        .filter(event => event.game)
-        .map( event => {
+        .filter(event => event && event.game && event.game.league) 
+        .map(event => {
             return {
                 name: event.title.trim().replace(/\s/g, ""),
                 start: moment(event.timespan.start).format('YYYY-MM-DD'),
@@ -72,6 +72,7 @@ const getLinkIds = (videoIds) => new Promise(resolve => {
 const getUrls = async (id, day) => {
     const eventList = await getEventList(id, day);
     const videoIds = await getVideoIds(eventList);
+    console.log(eventList)
 
     const events = await getLinkIds(videoIds.filter(videoId => Object.keys(videoId).length));
     return chunkArray(events.map(({ linkId, start, name, league }) => ({
