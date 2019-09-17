@@ -70,7 +70,8 @@ const selectMode = async () => {
 };
 
 const getQuestions = async () => {
-    const dirs = await getDirs('./src/extractors');
+    const footballDirs = await getDirs('./src/extractors');
+    const hockeyDirs = await getDirs('./src/extractors/hockey');
 
     const questions = [
         {
@@ -90,7 +91,10 @@ const getQuestions = async () => {
             name: 'parsersList',
             choices: [
                 new inquirer.Separator(' = Футбольные парсеры: = '),
-                ...getCheckBoxQuestions(dirs),
+                ...getCheckBoxQuestions(footballDirs),
+                new inquirer.Separator(' = Хоккейные парсеры: = '),
+                ...hockeyDirs.map(dirName => ({ name: dirName })),
+
             ],
             validate: function(answer) {
                 if (answer.length < 1) {
