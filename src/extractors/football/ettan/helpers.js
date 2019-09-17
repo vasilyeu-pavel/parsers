@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const formatDate = require('../../../utils/formatDate');
-const config = require('../../../config');
+const config = require('../../../../config');
 const { getCookies } = require('../../../utils');
 
 const parsedCoockies = (coockies) => {

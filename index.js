@@ -27,11 +27,11 @@ const parsers = async () => {
         switch (choice) {
             case 'Использовать парсеры': {
                 const { day, parsersList } = await getQuestions();
-                const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: true });
+                const browser = await puppeteer.launch({ args: ['--no-sandbox'], headless: false });
 
                 const result = await Promise.all(parsersList.map((parserName) => startScraping(browser, parserName, day)));
                 error = null;
-                await browser.close();
+                // await browser.close();
                 return result;
             }
             case 'Скачать матч ydl': {

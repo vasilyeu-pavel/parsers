@@ -1,4 +1,4 @@
-const config = require('../../../config');
+const config = require('../../../../config');
 const { auth, getPage, getCookies } = require('../../../utils');
 const { cookiesParser, getMatchList } = require('./helpers');
 const { runCmdHandler } = require('../../../downloader');

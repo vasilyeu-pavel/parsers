@@ -56,7 +56,7 @@ const auth = async (page, parserName) => {
 
 const getCookies = (page) => page.cookies();
 
-const getPage = async (browser, url) => {
+const getPage = async (browser, url, isLoadScript = true) => {
     const page = await browser.newPage();
 
     await page.setUserAgent(
@@ -64,23 +64,24 @@ const getPage = async (browser, url) => {
     );
 
     try {
-        await page.setRequestInterception(true);
+        if (isLoadScript) {
+            await page.setRequestInterception(true);
 
-        page.on('request', (request) => {
-            if (
-                blockedResourceTypes.indexOf(request.resourceType()) !== -1
-                || skippedResources.some((resource) => request.url().includes(resource))
-            ) {
-                request.abort();
-            }
-            else {
-                request.continue();
-            }
-        });
+            page.on('request', (request) => {
+                if (
+                    blockedResourceTypes.indexOf(request.resourceType()) !== -1
+                    || skippedResources.some((resource) => request.url().includes(resource))
+                ) {
+                    request.abort();
+                } else {
+                    request.continue();
+                }
+            });
 
-        page.on('dialog', async (dialog) => {
-            await dialog.dismiss();
-        });
+            page.on('dialog', async (dialog) => {
+                await dialog.dismiss();
+            });
+        }
 
         await page.goto(url, {
             waitLoad: true,

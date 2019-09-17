@@ -1,4 +1,3 @@
-const { getAuthOptions, getMatchList } = require('./helpers');
 const { auth, getPage } = require('../../../utils');
 const chunkArray = require('../../../utils/chunkArray');
 const formatDate = require('../../../utils/formatDate');
@@ -20,24 +19,30 @@ const downloader = async (matchList, parserName) => {
     }
 };
 
+const signIn = async ({ page, signInSelector }) => {
+    // go to signIn Page
+    await page.evaluate((selector) => {
+        [...document.querySelectorAll(selector)][1].click()
+    }, signInSelector);
+    // todo Pavel: disable coockie modal
+    // todo Pavel: enter signIn form
+    // todo Pavel: get token from cookies
+};
+
 const parser = async (browser, name, limit, day) => {
-    const { url } = config[name];
+    const {
+        url,
+        login,
+        password,
+        signInSelector,
 
-    const page = await getPage(browser, url);
+    } = config[name];
+    const page = await getPage(browser, url, false);
+    await signIn({ page, signInSelector });
 
-    await auth(page, name);
-
-    await page.waitForNavigation({ waitUntil: 'load' });
-
-    const authOptions = await getAuthOptions(page);
-
-    const matchList = await getMatchList(authOptions, name, limit, day);
-
-    await page.close();
-
-    return matchList;
+    return [];
 };
 
 module.exports = {
-    downloader, parser
+    parser
 };

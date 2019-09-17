@@ -4,7 +4,7 @@ const jsdom = require('jsdom');
 
 const formatDate = require('../../../utils/formatDate');
 const chunkArray = require('../../../utils/chunkArray');
-const config = require('../../../config');
+const config = require('../../../../config');
 
 const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
