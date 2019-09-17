@@ -1,28 +1,28 @@
-const request = require("request");
+const request = require('request');
 
 const config = {
     token: '649626996:AAHuIMPw2xLUEgAoQgO6nM-v9rcwlQTVlEI',
-    chatId: 405898308,
+    chatId: 405898308
 };
 
-const createMessage = ({ league, matches }) =>
-    `[#Скачались матчи] *(${league})*:
-${matches.map(({ name, date }, i) => `\n${i + 1}) *${date}_${name.replace(/ /g,'')}*`)}
+const createMessage = ({ league, matches }) => `[#Скачались матчи] *(${league})*:
+${matches.map(({ name, date }, i) => `\n${i + 1}) *${date}_${name.replace(/ /g, '')}*`)}
 `;
 
-const sendTelegramMessage = message => new Promise((resolve, reject) => {
+const sendTelegramMessage = (message) => new Promise((resolve, reject) => {
     const messages = createMessage(message).replace(/,/g, '');
 
     const options = {
         method: 'GET',
         url: `https://api.telegram.org/bot${config.token}/sendMessage`,
         qs:
-            { chat_id: config.chatId,
-                text:  messages
+            {
+                chat_id: config.chatId,
+                text: messages
             },
         headers:
             {
-                'Connection': 'keep-alive',
+                Connection: 'keep-alive',
                 'Accept-Encoding': '',
                 'Accept-Language': 'en-US,en;q=0.8',
                 'cache-control': 'no-cache',
@@ -31,11 +31,10 @@ const sendTelegramMessage = message => new Promise((resolve, reject) => {
         formData: { parse_mode: 'Markdown' }
     };
 
-    request(options, function (error, response, body) {
+    request(options, (error, response, body) => {
         if (error) reject(error);
         resolve(body);
     });
 });
 
 module.exports = { sendTelegramMessage };
-

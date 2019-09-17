@@ -15,17 +15,16 @@ const getEventList = async (id, day) => {
     if (!events || !Object.values(events).length) return;
 
     const eventList = Object.values(events)
-        .filter((event) => moment(event.timespan.start).format("YYYY-MM-DD") === moment(day).format("YYYY-MM-DD"))
-        .filter(event => event && event.game && event.game.league) 
-        .map(event => {
-            return {
-                name: event.title.trim().replace(/\s/g, ""),
-                start: moment(event.timespan.start).format('YYYY-MM-DD'),
-                id: event._id,
-                sport: event.sport.name,
-                league: config['nasport'].sports[0].leagues[event.game.league._id] && config['nasport'].sports[0].leagues[event.game.league._id].replace(/\s/g, "").replace(/\-/g, ""),
-            };
-        })
+        .filter((event) => moment(event.timespan.start).format('YYYY-MM-DD') === moment(day).format('YYYY-MM-DD'))
+        .filter((event) => event && event.game && event.game.league)
+        .map((event) => ({
+            name: event.title.trim().replace(/\s/g, ''),
+            start: moment(event.timespan.start).format('YYYY-MM-DD'),
+            id: event._id,
+            sport: event.sport.name,
+            league: config.nasport.sports[0].leagues[event.game.league._id]
+                && config.nasport.sports[0].leagues[event.game.league._id].replace(/\s/g, '').replace(/\-/g, '')
+        }))
         .filter(({ league }) => league);
 
     return eventList;
@@ -34,20 +33,20 @@ const getEventList = async (id, day) => {
 const getVideoId = async (eventId) => {
     const res = await fetch(`https://services.api.no/api/hjallis/v2/event/${eventId}`);
     const props = await res.json();
-    const { video }  = props;
+    const { video } = props;
 
-    if (!video ) return;
+    if (!video) return;
     const { videoId } = video;
     return { videoId };
 };
 
-const getVideoIds = (eventList) => new Promise(resolve => {
-    Promise.all(eventList.map(async event => {
+const getVideoIds = (eventList) => new Promise((resolve) => {
+    Promise.all(eventList.map(async (event) => {
         const video = await getVideoId(event.id);
         if (!video) return {};
-        return ({ videoId: video.videoId, ...event })
+        return ({ videoId: video.videoId, ...event });
     }))
-        .then(events => resolve(events));
+        .then((events) => resolve(events));
 });
 
 const getLinkId = async (videoId) => {
@@ -62,50 +61,49 @@ const getLinkId = async (videoId) => {
     }
 };
 
-const getLinkIds = (videoIds) => new Promise(resolve => {
-    Promise.all(videoIds.map(async event => ({
+const getLinkIds = (videoIds) => new Promise((resolve) => {
+    Promise.all(videoIds.map(async (event) => ({
         ...event,
         linkId: await getLinkId(event.videoId)
-    }))).then(res => resolve(res))
+    }))).then((res) => resolve(res));
 });
 
 const getUrls = async (id, day) => {
     const eventList = await getEventList(id, day);
     const videoIds = await getVideoIds(eventList);
-    console.log(eventList)
+    console.log(eventList);
 
-    const events = await getLinkIds(videoIds.filter(videoId => Object.keys(videoId).length));
-    return chunkArray(events.map(({ linkId, start, name, league }) => ({
+    const events = await getLinkIds(videoIds.filter((videoId) => Object.keys(videoId).length));
+    return chunkArray(events.map(({
+        linkId, start, name, league
+    }) => ({
         url: `https://lw-amedia-cf.lwcdn.com/hls/${linkId}/playlist.m3u8`,
-        name: name,
+        name,
         date: start,
         ID: linkId,
-        league,
+        league
     })), 10);
 };
 
 const downloader = async (urls, parserName) => {
-    for(const chunkUrls of urls) {
-        await Promise.all(chunkUrls.map(url =>
-            runCmdHandler(
-                './src/youtube-dl',
-                `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g,'')}.mp4`)
-        ));
+    for (const chunkUrls of urls) {
+        await Promise.all(chunkUrls.map((url) => runCmdHandler(
+            './src/youtube-dl',
+            `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g, '')}.mp4`
+        )));
         await sendTelegramMessage({
             league: parserName,
-            matches: chunkUrls,
+            matches: chunkUrls
         });
     }
 };
 
-const controller = async ({ id, name }, day) => {
-    return await getUrls(id, day);
-};
+const controller = async ({ id }, day) => await getUrls(id, day);
 
 const parser = async (browser, name, limit, day) => {
-    const sports = config[name].sports;
+    const { sports } = config[name];
 
-    for(const sport of sports) {
+    for (const sport of sports) {
         return await controller(sport, day);
     }
 };

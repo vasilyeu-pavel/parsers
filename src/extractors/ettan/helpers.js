@@ -3,7 +3,7 @@ const formatDate = require('../../utils/formatDate');
 const config = require('../../../config');
 const { getCookies } = require('../../utils');
 
-const parsedCoockies = coockies => {
+const parsedCoockies = (coockies) => {
     const result = {};
     coockies.forEach(({ name, value }) => {
         switch (name) {
@@ -16,14 +16,13 @@ const parsedCoockies = coockies => {
     return result;
 };
 
-const getAuthOptions = async page => {
+const getAuthOptions = async (page) => {
     const cookies = await getCookies(page);
 
     return parsedCoockies(cookies);
 };
 
-const filterByDay = (day, { date, duration }) =>
-    (formatDate(date) === formatDate(day))
+const filterByDay = (day, { date, duration }) => (formatDate(date) === formatDate(day))
     && +duration.split(':')[0] >= 1;
 
 const getMatchList = async (authOptions, parserName, limit, day) => {

@@ -9,20 +9,19 @@ const { sendTelegramMessage } = require('../../telegramBot');
 const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 7);
     for (let i = 0; i < chunkMatches.length; i++) {
-        await Promise.all(chunkMatches[i].map(({ ID, name, date }) =>
-            runCmdHandler(
-                './src/youtube-dl',
-                `youtube-dl --hls-prefer-native stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g,'')}.mp4`)
-        ));
+        await Promise.all(chunkMatches[i].map(({ ID, name, date }) => runCmdHandler(
+            './src/youtube-dl',
+            `youtube-dl --hls-prefer-native stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g, '')}.mp4`
+        )));
         await sendTelegramMessage({
             league: parserName,
-            matches: chunkMatches[i],
+            matches: chunkMatches[i]
         });
     }
 };
 
 const parser = async (browser, name, limit, day) => {
-    const url = config[name].url;
+    const { url } = config[name];
 
     const page = await getPage(browser, url);
 

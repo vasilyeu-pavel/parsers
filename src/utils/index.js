@@ -9,7 +9,7 @@ const blockedResourceTypes = [
     'beacon',
     'csp_report',
     'imageset',
-    'stylesheet',
+    'stylesheet'
 ];
 
 const skippedResources = [
@@ -33,11 +33,13 @@ const skippedResources = [
     'clicksor',
     'tiqcdn',
     '.png',
-    'jquery',
+    'jquery'
 ];
 
 const auth = async (page, parserName) => {
-    const { login, password, loginSelector, passwordSelector, submitButton } = config[parserName];
+    const {
+        login, password, loginSelector, passwordSelector, submitButton
+    } = config[parserName];
 
     await page.waitForSelector(loginSelector);
     const loginInput = await page.$(loginSelector);
@@ -52,12 +54,14 @@ const auth = async (page, parserName) => {
     btn.click();
 };
 
-const getCookies = async page => await page.cookies();
+const getCookies = (page) => page.cookies();
 
 const getPage = async (browser, url) => {
     const page = await browser.newPage();
 
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36');
+    await page.setUserAgent(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3419.0 Safari/537.36'
+    );
 
     try {
         await page.setRequestInterception(true);
@@ -65,10 +69,11 @@ const getPage = async (browser, url) => {
         page.on('request', (request) => {
             if (
                 blockedResourceTypes.indexOf(request.resourceType()) !== -1
-                || skippedResources.some(resource => request.url().includes(resource))
+                || skippedResources.some((resource) => request.url().includes(resource))
             ) {
                 request.abort();
-            } else {
+            }
+            else {
                 request.continue();
             }
         });
@@ -78,14 +83,15 @@ const getPage = async (browser, url) => {
         });
 
         await page.goto(url, {
-                waitLoad: true,
-                waitNetworkIdle: true,
-                timeout: 29000,
-                waitUntil: 'networkidle0',
+            waitLoad: true,
+            waitNetworkIdle: true,
+            timeout: 29000,
+            waitUntil: 'networkidle0'
         });
 
         return page;
-    } catch (e) {
+    }
+    catch (e) {
         throw new Error(`Ошибка открытия страницы, ${e.message}`);
     }
 };
