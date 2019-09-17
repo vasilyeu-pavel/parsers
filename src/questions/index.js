@@ -3,17 +3,17 @@ const { getDirs } = require('../utils/getDirs');
 
 inquirer.registerPrompt('datetime', require('inquirer-datepicker-prompt'));
 
-const getCheckBoxQuestions = dirs => dirs.map((dir, i) => {
-        if (i === 0) {
-            return {
-                name: dir,
-                checked: true,
-            }
-        }
+const getCheckBoxQuestions = (dirs) => dirs.map((dir, i) => {
+    if (i === 0) {
         return {
             name: dir,
-        }
-    });
+            checked: true
+        };
+    }
+    return {
+        name: dir
+    };
+});
 
 const validateName = (name) => name !== '';
 
@@ -22,21 +22,21 @@ const validateUrl = (name) => name !== '' && name.includes('.');
 const questionsForDownloadSimpleMatch = async () => {
     const questions = [
         {
-            message: "Что будем скачивать(ссылка)?",
-            type: "input",
-            name: "url",
+            message: 'Что будем скачивать(ссылка)?',
+            type: 'input',
+            name: 'url',
             validate: validateUrl
         },
         {
-            message: "Под каким названием сохранить файл?",
-            type: "input",
-            name: "name",
+            message: 'Под каким названием сохранить файл?',
+            type: 'input',
+            name: 'name',
             validate: validateName
         },
         {
-            message: "Дополнительные опции для ydl (--hls-prefer-native) - перечисление через пробел",
-            type: "input",
-            name: "options",
+            message: 'Дополнительные опции для ydl (--hls-prefer-native) - перечисление через пробел',
+            type: 'input',
+            name: 'options'
         }
     ];
 
@@ -51,10 +51,10 @@ const selectMode = async () => {
             name: 'choice',
             choices: [
                 {
-                    name: 'Использовать парсеры',
+                    name: 'Использовать парсеры'
                 },
                 {
-                    name: 'Скачать матч ydl',
+                    name: 'Скачать матч ydl'
                 },
                 {
                     name: 'Скачать матчи из файла'
@@ -62,8 +62,8 @@ const selectMode = async () => {
                 {
                     name: 'Выход!'
                 }
-            ],
-        },
+            ]
+        }
     ];
 
     return inquirer.prompt(questions);
@@ -81,9 +81,9 @@ const getQuestions = async () => {
             format: ['yyyy', '-', 'mm', '-', 'dd'],
             initial: Date.parse(new Date()),
             date: {
-                min: "1/1/2017",
-                max: "3/1/2017"
-            },
+                min: '1/1/2017',
+                max: '3/1/2017'
+            }
         },
         {
             type: 'checkbox',
@@ -93,10 +93,10 @@ const getQuestions = async () => {
                 new inquirer.Separator(' = Футбольные парсеры: = '),
                 ...getCheckBoxQuestions(footballDirs),
                 new inquirer.Separator(' = Хоккейные парсеры: = '),
-                ...hockeyDirs.map(dirName => ({ name: dirName })),
+                ...hockeyDirs.map((dirName) => ({ name: dirName }))
 
             ],
-            validate: function(answer) {
+            validate(answer) {
                 if (answer.length < 1) {
                     return 'Вы ничего не выбрали - выберите парсер!';
                 }
