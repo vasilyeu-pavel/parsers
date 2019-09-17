@@ -70,7 +70,7 @@ const selectMode = async () => {
 };
 
 const getQuestions = async () => {
-    const footballDirs = await getDirs('./src/extractors');
+    const footballDirs = await getDirs('./src/extractors/football');
     const hockeyDirs = await getDirs('./src/extractors/hockey');
 
     const questions = [

@@ -3,11 +3,14 @@ const { printHeader } = require('./src/utils/printHeader');
 const chunkArray = require('./src/utils/chunkArray');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
+const { getSportNameByParserName } = require('./src/utils/getSportName');
 
 let error = null;
 
 const startScraping = async (browser, parserName, day) => {
-    const { downloader, parser } = require(`./src/extractors/${parserName}`);
+    const sportName = getSportNameByParserName(parserName);
+
+    const { downloader, parser } = require(`./src/extractors/${sportName}/${parserName}`);
 
     const matches = await parser(browser, parserName, 100, day);
 
