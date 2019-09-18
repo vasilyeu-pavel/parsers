@@ -6,14 +6,14 @@ const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
 const { getAuthToken, getMatches, convertDate } = require('./helpers');
 
-const downloader = async (matchList, parserName) => {
+const downloader = async (matchList, parserName, day) => {
     const chunkMatches = chunkArray(matchList, 7);
     for (let i = 0; i < chunkMatches.length; i++) {
         await Promise.all(chunkMatches[i].map(({
             id, title, date, url
         }) => runCmdHandler(
             './src/youtube-dl',
-            `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${formatDate(date)}_${title.replace(/ /g, '')}.mp4`
+            `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${formatDate(day)}_${title.replace(/ /g, '')}.mp4`
         )));
         await sendTelegramMessage({
             league: parserName,

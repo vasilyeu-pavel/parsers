@@ -15,7 +15,7 @@ const startScraping = async (browser, parserName, day) => {
     const matches = await parser(browser, parserName, 100, day);
 
     if (!matches.length) return;
-    await downloader(matches, parserName);
+    await downloader(matches, parserName, day);
 };
 
 const parsers = async () => {
