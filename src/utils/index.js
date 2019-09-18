@@ -62,7 +62,8 @@ const getFrame = async (page, { frameName, parserName }) => {
 
     try {
         await page.waitFor(3000);
-    } catch (e) {
+    }
+    catch (e) {
         throw new Error(`Not found iFrame -> ${frameName} in ${parserName}, ${e}`);
     }
 
@@ -102,7 +103,8 @@ const getPage = async (browser, url, isLoadScript = true) => {
                     || skippedResources.some((resource) => request.url().includes(resource))
                 ) {
                     request.abort();
-                } else {
+                }
+                else {
                     request.continue();
                 }
             });
