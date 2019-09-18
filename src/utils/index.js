@@ -41,20 +41,49 @@ const auth = async (page, parserName) => {
         login, password, loginSelector, passwordSelector, submitButton
     } = config[parserName];
 
-    await page.waitForSelector(loginSelector);
+    // await page.waitForSelector(loginSelector);
+    await page.waitFor(500);
     const loginInput = await page.$(loginSelector);
     await loginInput.type(login);
 
-    await page.waitForSelector(passwordSelector);
+    // await page.waitForSelector(passwordSelector);
+    await page.waitFor(500);
     const passwordInput = await page.$(passwordSelector);
     await passwordInput.type(password);
 
-    await page.waitForSelector(submitButton);
+    // await page.waitForSelector(submitButton);
+    await page.waitFor(500);
     const btn = await page.$(submitButton);
     btn.click();
 };
 
-const getCookies = (page) => page.cookies();
+const getFrame = async (page, { frameName, parserName }) => {
+    if (!page) return;
+
+    try {
+        await page.waitFor(3000);
+    } catch (e) {
+        throw new Error(`Not found iFrame -> ${frameName} in ${parserName}, ${e}`);
+    }
+
+    const frames = {};
+
+    function deepSearchFrame(frame, indent, targetName) {
+        if (frame.name() === targetName) {
+            frames[targetName] = frame;
+        }
+        for (const child of frame.childFrames()) {
+            deepSearchFrame(child, `${indent}  `, targetName);
+        }
+    }
+
+    deepSearchFrame(page.mainFrame(), '', frameName);
+
+    return frames[frameName];
+};
+
+
+const getCookies = async (page) => await page.cookies();
 
 const getPage = async (browser, url, isLoadScript = true) => {
     const page = await browser.newPage();
@@ -97,4 +126,9 @@ const getPage = async (browser, url, isLoadScript = true) => {
     }
 };
 
-module.exports = { auth, getCookies, getPage };
+module.exports = {
+    auth,
+    getCookies,
+    getPage,
+    getFrame
+};

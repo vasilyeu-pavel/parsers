@@ -1,4 +1,4 @@
-const { auth, getPage } = require('../../../utils');
+const { auth, getPage, getCookies } = require('../../../utils');
 const chunkArray = require('../../../utils/chunkArray');
 const formatDate = require('../../../utils/formatDate');
 const config = require('../../../../config');
@@ -19,26 +19,65 @@ const downloader = async (matchList, parserName) => {
     }
 };
 
-const signIn = async ({ page, signInSelector }) => {
+const cookiesParser = (cookies) => {
+    const arrFiltered = cookies.filter((el) => el.name === 'gatling_token');
+
+    let str = '';
+    for (let i = 0; i < arrFiltered.length; i++) {
+        const elCookies = `${arrFiltered[i].name}=${arrFiltered[i].value}`;
+        str += elCookies;
+    }
+
+    return str;
+};
+
+const getAuthToken = async (
+    {
+        page,
+        signInSelector,
+        cookiesModalSelector,
+        parserName,
+    }
+) => {
     // go to signIn Page
     await page.evaluate((selector) => {
         [...document.querySelectorAll(selector)][1].click()
     }, signInSelector);
-    // todo Pavel: disable coockie modal
-    // todo Pavel: enter signIn form
-    // todo Pavel: get token from cookies
+
+    await page.waitFor(3000);
+    // hide cookies modal
+    await page.evaluate(s => document.querySelector(s).click(), cookiesModalSelector);
+
+    // get all loaded iframes
+    const framesSrc = await page.evaluate(s => [...document.querySelectorAll('iframe')].map(f => f.src));
+    // filter iframes by target needed
+    const filteredSrc = framesSrc.filter(src => src.includes('nelonenmedia'));
+
+    if (!filteredSrc.length) throw new Error('Ruutu auth frame is not loaded');
+
+    // go to redirect_url
+    await page.goto(filteredSrc[0]);
+
+    await page.waitFor(1000);
+
+    // enter sign in form
+    await auth(page, parserName);
+
+    await page.waitFor(5000);
+
+    // get cookies
+    const cookies = await getCookies(page);
+
+    const parsedCookies = cookiesParser(cookies);
+
+    return parsedCookies;
 };
 
 const parser = async (browser, name, limit, day) => {
-    const {
-        url,
-        login,
-        password,
-        signInSelector,
-
-    } = config[name];
+    const { url } = config[name];
     const page = await getPage(browser, url, false);
-    await signIn({ page, signInSelector });
+
+    const authToken = await getAuthToken({ page, ...config[name], parserName: name });
 
     return [];
 };
