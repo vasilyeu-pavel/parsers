@@ -32,7 +32,7 @@ const parsers = async () => {
 
                 const result = await Promise.all(parsersList.map((parserName) => startScraping(browser, parserName, day)));
                 error = null;
-                await browser.close();
+                // await browser.close();
                 return result;
             }
             case 'Скачать матч ydl': {

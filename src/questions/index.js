@@ -73,6 +73,21 @@ const getQuestions = async () => {
     const footballDirs = await getDirs('./src/extractors/football');
     const hockeyDirs = await getDirs('./src/extractors/hockey');
 
+    const hockeyParsers = hockeyDirs.map((dirName) => {
+        if (dirName !== 'ruutu') return [{ name: dirName }];
+        return [
+            {
+                name: `${dirName}-mestis`
+            },
+            {
+                name: `${dirName}-nuorten`
+            },
+            {
+                name: `${dirName}-sarja`
+            },
+        ];
+    });
+
     const questions = [
         {
             type: 'datetime',
@@ -89,13 +104,12 @@ const getQuestions = async () => {
             type: 'checkbox',
             message: 'Что будем парсить?',
             name: 'parsersList',
+            pageSize: 10,
             choices: [
                 new inquirer.Separator(' = Футбольные парсеры: = '),
                 ...getCheckBoxQuestions(footballDirs),
                 new inquirer.Separator(' = Хоккейные парсеры: = '),
-                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-mestis` })),
-                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-nuorten` })),
-                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-sarja` }))
+                ...hockeyParsers.reduce((a,b) => a.concat(b)),
 
             ],
             validate(answer) {
