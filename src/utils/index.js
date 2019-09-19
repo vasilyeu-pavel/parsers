@@ -128,9 +128,22 @@ const getPage = async (browser, url, isLoadScript = true) => {
     }
 };
 
+const cookiesParser = (cookies, taretName = 'gatling_token') => {
+    const arrFiltered = cookies.filter((el) => el.name === taretName);
+
+    let str = '';
+    for (let i = 0; i < arrFiltered.length; i++) {
+        const elCookies = `${arrFiltered[i].name}=${arrFiltered[i].value}`;
+        str += elCookies;
+    }
+
+    return str;
+};
+
 module.exports = {
     auth,
     getCookies,
     getPage,
-    getFrame
+    getFrame,
+    cookiesParser,
 };

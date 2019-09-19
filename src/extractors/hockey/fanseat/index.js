@@ -40,7 +40,7 @@ const getMatchList = async ({ selectedDate }) => {
                 id,
                 date: moment(created_at).format('YYYY-MM-DD'),
                 title: `${name}-${channelName}`,
-                url: `https://stor-2.staylive.se/seodiv/${id}/playlist.php?video=${id}&type=HLS&location=2`
+                url: `https://stor-2.staylive.se/seodiv/${id}/720/720.m3u8`
 
             }));
     }

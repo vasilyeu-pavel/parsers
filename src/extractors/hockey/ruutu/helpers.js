@@ -1,20 +1,8 @@
 const { URL, URLSearchParams } = require('url');
 const fetch = require('node-fetch');
 const jsdom = require('jsdom');
-const { auth, getCookies } = require('../../../utils');
+const { auth, getCookies, cookiesParser } = require('../../../utils');
 const config = require('../../../../config');
-
-const cookiesParser = (cookies) => {
-    const arrFiltered = cookies.filter((el) => el.name === 'gatling_token');
-
-    let str = '';
-    for (let i = 0; i < arrFiltered.length; i++) {
-        const elCookies = `${arrFiltered[i].name}=${arrFiltered[i].value}`;
-        str += elCookies;
-    }
-
-    return str;
-};
 
 const getAuthToken = async (
     {
@@ -53,7 +41,7 @@ const getAuthToken = async (
     // get cookies
     const cookies = await getCookies(page);
 
-    const parsedCookies = cookiesParser(cookies);
+    const parsedCookies = cookiesParser(cookies, 'gatling_token');
 
     return parsedCookies;
 };
