@@ -95,7 +95,7 @@ const getQuestions = async () => {
                 new inquirer.Separator(' = Хоккейные парсеры: = '),
                 ...hockeyDirs.map((dirName) => ({ name: `${dirName}-mestis` })),
                 ...hockeyDirs.map((dirName) => ({ name: `${dirName}-nuorten` })),
-                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-sarja` })),
+                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-sarja` }))
 
             ],
             validate(answer) {

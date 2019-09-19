@@ -102,8 +102,8 @@ const getLeagueMatches = async ({ parserName, league }) => {
 
     const response = await fetch(getUrl(
         'https://prod-component-api.nm-services.nelonenmedia.fi/api/component/26611',
-        leagueOptions)
-    );
+        leagueOptions
+    ));
 
     const parsedResponse = await response.json();
 
