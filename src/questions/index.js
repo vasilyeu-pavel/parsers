@@ -84,7 +84,7 @@ const getQuestions = async () => {
             },
             {
                 name: `${dirName}-sarja`
-            },
+            }
         ];
     });
 
@@ -109,7 +109,7 @@ const getQuestions = async () => {
                 new inquirer.Separator(' = Футбольные парсеры: = '),
                 ...getCheckBoxQuestions(footballDirs),
                 new inquirer.Separator(' = Хоккейные парсеры: = '),
-                ...hockeyParsers.reduce((a,b) => a.concat(b)),
+                ...hockeyParsers.reduce((a, b) => a.concat(b))
 
             ],
             validate(answer) {
