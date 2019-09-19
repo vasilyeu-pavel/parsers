@@ -2,6 +2,7 @@ const { URL, URLSearchParams } = require('url');
 const fetch = require('node-fetch');
 const jsdom = require('jsdom');
 const { auth, getCookies } = require('../../../utils');
+const config = require('../../../../config');
 
 const cookiesParser = (cookies) => {
     const arrFiltered = cookies.filter((el) => el.name === 'gatling_token');
@@ -57,22 +58,6 @@ const getAuthToken = async (
     return parsedCookies;
 };
 
-const configNuorten = {
-    offset: 0,
-    limit: 60,
-    current_series_id: 3285973,
-    app: 'ruutu',
-    client: 'web'
-};
-
-const configSuomi = {
-    offset: 0,
-    limit: 60,
-    current_series_id: 3285972,
-    app: 'ruutu',
-    client: 'web'
-};
-
 const getUrl = (link, config) => {
     const url = new URL(link);
     url.search = new URLSearchParams(config);
@@ -112,17 +97,21 @@ const requestFromManifest = async (gatling_token, match) => {
     };
 };
 
-const getMatches = async (gatling_token = 'gatling_token', d = convertDate(new Date())) => {
-    const response = await fetch(getUrl('https://prod-component-api.nm-services.nelonenmedia.fi/api/component/26611', configNuorten));
-    const responseS = await fetch(getUrl('https://prod-component-api.nm-services.nelonenmedia.fi/api/component/26611', configSuomi));
+const getLeagueMatches = async ({ parserName, league }) => {
+    const leagueOptions = config[parserName].leaguesOptions[league];
+
+    const response = await fetch(getUrl(
+        'https://prod-component-api.nm-services.nelonenmedia.fi/api/component/26611',
+        leagueOptions)
+    );
+
     const parsedResponse = await response.json();
 
-    const matchesOptions = getMatchId(parsedResponse);
+    return getMatchId(parsedResponse);
+};
 
-    const parsedResponseS = await responseS.json();
-    const matchesOptionsS = getMatchId(parsedResponseS);
-
-    const matches = matchesOptions.concat(matchesOptionsS);
+const getMatches = async (gatling_token = 'gatling_token', d = convertDate(new Date()), parserName, league) => {
+    const matches = await getLeagueMatches({ parserName, league });
 
     const result = await Promise.all(matches.map(requestFromManifest.bind(null, gatling_token)));
 

@@ -8,14 +8,15 @@ const { getSportNameByParserName } = require('./src/utils/getSportName');
 let error = null;
 
 const startScraping = async (browser, parserName, day) => {
+    const [scraperName, league] = parserName.split('-');
     const sportName = getSportNameByParserName(parserName);
 
-    const { downloader, parser } = require(`./src/extractors/${sportName}/${parserName}`);
+    const { downloader, parser } = require(`./src/extractors/${sportName}/${scraperName}`);
 
-    const matches = await parser(browser, parserName, 100, day);
+    const matches = await parser(browser, scraperName, 100, day, league);
 
     if (!matches.length) return;
-    await downloader(matches, parserName, day);
+    await downloader(matches, scraperName, day);
 };
 
 const parsers = async () => {

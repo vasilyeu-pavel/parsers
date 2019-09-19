@@ -22,7 +22,7 @@ const downloader = async (matchList, parserName, day) => {
     }
 };
 
-const parser = async (browser, name, limit, day) => {
+const parser = async (browser, name, limit, day, league) => {
     const { url } = config[name];
 
     const date = convertDate(day);
@@ -31,9 +31,7 @@ const parser = async (browser, name, limit, day) => {
 
     const token = await getAuthToken({ page, ...config[name], parserName: name });
 
-    const matches = await getMatches(token, date);
-
-    return matches;
+    return await getMatches(token, date, name, league);
 };
 
 module.exports = {

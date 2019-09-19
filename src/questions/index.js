@@ -93,7 +93,9 @@ const getQuestions = async () => {
                 new inquirer.Separator(' = Футбольные парсеры: = '),
                 ...getCheckBoxQuestions(footballDirs),
                 new inquirer.Separator(' = Хоккейные парсеры: = '),
-                ...hockeyDirs.map((dirName) => ({ name: dirName }))
+                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-mestis` })),
+                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-nuorten` })),
+                ...hockeyDirs.map((dirName) => ({ name: `${dirName}-sarja` })),
 
             ],
             validate(answer) {
