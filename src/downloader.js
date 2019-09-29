@@ -11,29 +11,46 @@ const spawnLinuxProcess = (dir, cmd) => {
     return spawn(cmdParts[0], cmdParts.slice(1), { cwd: dir });
 };
 
-const runCmdHandler = (dir, cmd) => {
+const runCmdHandler = async (dir, cmd) => {
     let process = null;
+    let isRetry = false;
+
     try {
         process = spawnProcess(dir, cmd);
-        return new Promise((resolve) => {
+        await new Promise((resolve, reject) => {
             console.log('start --->', cmd);
             process.stdout.on('data', (data) => {
                 console.log('progress', data.toString('utf-8'));
             });
             process.stderr.on('data', (data) => {
                 console.log('error', data.toString('utf-8'));
+                if (data.toString('utf-8').includes('Did not get any data blocks')) {
+                    reject(data.toString('utf-8'));
+                }
             });
             process.on('exit', (code, signal) => {
                 console.log('finish ---> resolve', code, signal);
+                isRetry = false;
                 resolve('true');
             });
         });
     }
     catch (e) {
+        if (e.includes('Did not get any data blocks')) {
+            isRetry = true;
+        }
         console.error(`Error trying to execute command '${cmd}' in directory '${dir}'`);
         console.error(e);
         console.log('error', e.message);
         console.log('finished');
+    }
+
+    if (isRetry) {
+        isRetry = false;
+        console.log('Retry ---> download');
+        runCmdHandler(dir, cmd);
+    } else {
+        return true;
     }
 };
 
