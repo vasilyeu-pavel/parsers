@@ -98,6 +98,12 @@ const getLeagueMatches = async ({ parserName, league }) => {
     return getMatchId(parsedResponse);
 };
 
+const getDateFromName = (name) => {
+    const parsedName = name.split(' ');
+
+    return parsedName[parsedName.length - 1];
+};
+
 const getMatches = async (gatling_token = 'gatling_token', d = convertDate(new Date()), parserName, league) => {
     const matches = await getLeagueMatches({ parserName, league });
 
@@ -107,6 +113,11 @@ const getMatches = async (gatling_token = 'gatling_token', d = convertDate(new D
 
     result.forEach((item) => {
         [d].forEach((date) => {
+            if (!item.date) {
+                if (getDateFromName(item.name) === date) {
+                    filteredReslut.push(item);
+                }
+            }
             if (item.date === date) filteredReslut.push(item);
         });
     });
