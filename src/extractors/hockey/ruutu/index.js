@@ -7,7 +7,7 @@ const { sendTelegramMessage } = require('../../../telegramBot');
 const { getAuthToken, getMatches, convertDate } = require('./helpers');
 
 const downloader = async (matchList, parserName, day) => {
-    const chunkMatches = chunkArray(matchList, 7);
+    const chunkMatches = chunkArray(matchList, 9);
     for (let i = 0; i < chunkMatches.length; i++) {
         await Promise.all(chunkMatches[i].map(({
             id, title, date, url

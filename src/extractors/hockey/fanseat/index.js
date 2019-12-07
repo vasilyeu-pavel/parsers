@@ -21,6 +21,16 @@ const downloader = async (matchList, parserName, day) => {
     }
 };
 
+const parseUrlString = thumbnail => {
+    if (!thumbnail) return;
+
+    const url = thumbnail.split('/');
+
+    url.pop();
+
+    return url.join('/');
+};
+
 const getMatchList = async ({ selectedDate }) => {
     try {
         const res = await fetch('https://api.staylive.tv/videos/feed?limit=100&page=1', {
@@ -35,13 +45,14 @@ const getMatchList = async ({ selectedDate }) => {
         return message
             .filter(({ created_at }) => moment(created_at).format('YYYY-MM-DD') === moment(selectedDate).format('YYYY-MM-DD'))
             .map(({
-                id, created_at, name, channelName
+                id, created_at, name, channelName, url_string, thumbnail
             }) => ({
                 id,
                 date: moment(created_at).format('YYYY-MM-DD'),
-                title: `${name}-${channelName}`,
-                url: `https://stor-2.staylive.se/seodiv/${id}/720/720.m3u8`
-
+                name: `${name}-${channelName}`,
+                // url: `https://stor-2.staylive.se/seodiv/${parseUrlString(url_string) || id}/720/720.m3u8`
+                // https://video-cache-sto-01.staylive.se/dggxwju/720/720.m3u8
+                url: `${parseUrlString(thumbnail)}/720/720.m3u8`
             }));
     }
     catch (e) {
