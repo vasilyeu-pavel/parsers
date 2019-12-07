@@ -58,7 +58,7 @@ const getMatchId = (parseredResponse) => {
     parseredResponse.items.forEach((el) => {
         filteredRsponse.push({
             id: el.id,
-            title: el.title.split(', Fanikamera ')[0],
+            name: el.title.split(', Fanikamera ')[0],
             date: el.title.split(', Fanikamera ')[1]
         });
     });
