@@ -5,12 +5,16 @@ const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
 const chunkArray = require('../../../utils/chunkArray');
 
+const { isDownloading } = require('../../../utils/readFile');
+
 const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 10);
     for (let i = 0; i < chunkMatches.length; i++) {
         await Promise.all(chunkMatches[i].map(({
             ID, name, date, url, league
-        }) => runCmdHandler(
+        }) =>
+            !isDownloading(`${parserName}/${league}/${date}_${name}.mp4`)
+            && runCmdHandler(
             './src/youtube-dl',
             `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${league}/${date}_${name}.mp4`
         )));
