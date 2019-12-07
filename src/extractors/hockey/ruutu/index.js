@@ -13,7 +13,7 @@ const downloader = async (matchList, parserName, day) => {
             id, title, date, url
         }) => runCmdHandler(
             './src/youtube-dl',
-            `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${formatDate(day)}_${title.replace(/ /g, '')}.mp4`
+            `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${formatDate(day)}_${name.replace(/ /g, '')}.mp4`
         )));
         await sendTelegramMessage({
             league: parserName,
