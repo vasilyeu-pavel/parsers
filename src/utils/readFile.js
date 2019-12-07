@@ -14,4 +14,9 @@ const readFile = (readFileName, callback) => {
         });
 };
 
-module.exports = readFile;
+const isDownloading = path => fs.existsSync(`./src/youtube-dl/${path}`);
+
+module.exports = {
+    readFile,
+    isDownloading,
+};

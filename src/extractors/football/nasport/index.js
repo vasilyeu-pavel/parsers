@@ -85,9 +85,13 @@ const getUrls = async (id, day) => {
     })), 10);
 };
 
+const { isDownloading } = require('../../../utils/readFile');
+
 const downloader = async (urls, parserName) => {
     for (const chunkUrls of urls) {
-        await Promise.all(chunkUrls.map((url) => runCmdHandler(
+        await Promise.all(chunkUrls.map((url) =>
+            !isDownloading(`${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g, '')}.mp4`)
+            && runCmdHandler(
             './src/youtube-dl',
             `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g, '')}.mp4`
         )));
