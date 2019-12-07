@@ -6,10 +6,14 @@ const config = require('../../../../config');
 const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
 
+const { isDownloading } = require('../../../utils/readFile');
+
 const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 7);
     for (let i = 0; i < chunkMatches.length; i++) {
-        await Promise.all(chunkMatches[i].map(({ ID, name, date }) => runCmdHandler(
+        await Promise.all(chunkMatches[i].map(({ ID, name, date }) =>
+            !isDownloading(`${parserName}/${formatDate(date)}_${name.replace(/ /g, '')}.mp4`)
+            && runCmdHandler(
             './src/youtube-dl',
             `youtube-dl --hls-prefer-native stor-2.staylive.se/seodiv/${ID}/720/720.m3u8 --output ${parserName}/${formatDate(date)}_${name.replace(/ /g, '')}.mp4`
         )));
