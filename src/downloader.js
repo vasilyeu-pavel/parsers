@@ -1,4 +1,7 @@
 const { spawn } = require('child_process');
+const { isDownloading } = require('./utils/fileAPI');
+
+const { sendTelegramMessage } = require('./telegramBot');
 
 const spawnProcess = (dir, cmd) => ((process.platform.toLowerCase().indexOf('win') >= 0)
     ? spawnWindowsProcess(dir, cmd)
@@ -54,6 +57,26 @@ const runCmdHandler = async (dir, cmd) => {
     }
 };
 
+const download = async ({ url: input, output }) => {
+    return !isDownloading(output) && runCmdHandler(
+        './src/youtube-dl',
+        `youtube-dl --hls-prefer-native ${input} --output ${output}`
+    );
+};
+
+const downloadController = async (urls, parserName = 'emptyParser') => {
+    for (const chunkUrls of urls) {
+        await Promise.all(chunkUrls.map(download));
+
+        await sendTelegramMessage({
+            league: parserName,
+            matches: chunkUrls
+        });
+    }
+};
+
 module.exports = {
-    runCmdHandler
+    runCmdHandler,
+    download,
+    downloadController,
 };

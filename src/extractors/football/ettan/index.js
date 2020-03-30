@@ -6,7 +6,7 @@ const config = require('../../../../config');
 const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
 
-const { isDownloading } = require('../../../utils/readFile');
+const { isDownloading } = require('../../../utils/fileAPI');
 
 const downloader = async (matchList, parserName) => {
     const chunkMatches = chunkArray(matchList, 7);

@@ -6,6 +6,8 @@ const formatDate = require('../../../utils/formatDate');
 const chunkArray = require('../../../utils/chunkArray');
 const config = require('../../../../config');
 
+const { isDownloading } = require('../../../utils/fileAPI');
+
 const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
 
@@ -68,24 +70,21 @@ const getLinkIds = (videoIds) => new Promise((resolve) => {
     }))).then((res) => resolve(res));
 });
 
-const getUrls = async (id, day) => {
+const getUrls = async (id, day, parserName) => {
     const eventList = await getEventList(id, day);
     const videoIds = await getVideoIds(eventList);
-    console.log(eventList);
 
     const events = await getLinkIds(videoIds.filter((videoId) => Object.keys(videoId).length));
-    return chunkArray(events.map(({
-        linkId, start, name, league
-    }) => ({
+
+    return events.map(({ linkId, start, name, league }) => ({
         url: `https://lw-amedia-cf.lwcdn.com/hls/${linkId}/playlist.m3u8`,
         name,
         date: start,
         ID: linkId,
-        league
-    })), 10);
+        league,
+        output: `${parserName}/${formatDate(start)}_${name.replace(/ /g, '')}.mp4`,
+    }));
 };
-
-const { isDownloading } = require('../../../utils/readFile');
 
 const downloader = async (urls, parserName) => {
     for (const chunkUrls of urls) {
@@ -102,13 +101,13 @@ const downloader = async (urls, parserName) => {
     }
 };
 
-const controller = async ({ id }, day) => await getUrls(id, day);
+const controller = async ({ id }, day, parserName) => await getUrls(id, day, parserName);
 
-const parser = async (browser, name, limit, day) => {
-    const { sports } = config[name];
+const parser = async (browser, parserName, limit, day) => {
+    const { sports } = config[parserName];
 
     for (const sport of sports) {
-        return await controller(sport, day);
+        return await controller(sport, day, parserName);
     }
 };
 

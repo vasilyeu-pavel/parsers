@@ -5,7 +5,7 @@ const formatDate = require('../../../utils/formatDate');
 const { runCmdHandler } = require('../../../downloader');
 const { sendTelegramMessage } = require('../../../telegramBot');
 
-const { isDownloading } = require('../../../utils/readFile');
+const { isDownloading } = require('../../../utils/fileAPI');
 
 const downloader = async (matchList, parserName, day) => {
     const chunkMatches = chunkArray(matchList, 7);
