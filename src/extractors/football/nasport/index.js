@@ -50,14 +50,14 @@ const getVideoIds = (eventList) => new Promise((resolve) => {
 });
 
 const getLinkId = async (videoId) => {
-    const { JSDOM } = jsdom;
-    const res = await fetch(`https://ljsp.lwcdn.com/api/video/embed.jsp?id=${videoId}`);
-    const response = await res.text();
+    try {
+        const res = await fetch(`https://ljsp.lwcdn.com/web/public/native/config/media/${videoId}`);
+        const { metadata: { media_id } } = await res.json();
 
-    const dom = new JSDOM(response);
-    const container = dom.window.document.querySelector('#flowplayer-ovp-container');
-    if (container) {
-        return container.getAttribute('data-id');
+        return media_id
+    } catch (e) {
+        console.log(e);
+        return null
     }
 };
 
@@ -71,7 +71,6 @@ const getLinkIds = (videoIds) => new Promise((resolve) => {
 const getUrls = async (id, day) => {
     const eventList = await getEventList(id, day);
     const videoIds = await getVideoIds(eventList);
-    console.log(eventList);
 
     const events = await getLinkIds(videoIds.filter((videoId) => Object.keys(videoId).length));
     return chunkArray(events.map(({
