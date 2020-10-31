@@ -12,14 +12,13 @@ const getAuthToken = async (
         parserName
     }
 ) => {
-    // go to signIn Page
-    await page.evaluate((selector) => {
-        [...document.querySelectorAll(selector)][1].click();
-    }, signInSelector);
+       try {
+        await page.evaluate((selector) => document.querySelector(selector).click(), signInSelector);
+    } catch (e) {
+        console.log('====signInSelector====', e)
+    }
 
     await page.waitFor(3000);
-    // hide cookies modal
-    await page.evaluate((s) => document.querySelector(s).click(), cookiesModalSelector);
 
     // get all loaded iframes
     const framesSrc = await page.evaluate((s) => [...document.querySelectorAll('iframe')].map((f) => f.src));
@@ -34,6 +33,7 @@ const getAuthToken = async (
     await page.waitFor(1000);
 
     // enter sign in form
+
     await auth(page, parserName);
 
     await page.waitFor(5000);
