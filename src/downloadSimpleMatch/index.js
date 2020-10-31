@@ -1,7 +1,7 @@
-const { runCmdHandler } = require('../downloader');
+const { runCmdHandler } = require('../utils/runCmdHandler');
 const { sendTelegramMessage } = require('../telegramBot');
 
-const downloader = async ({ url, name, options }) => {
+const downloaderSM = async ({ url, name, options }) => {
     if (options.length) {
         await runCmdHandler(
             './src/youtube-dl',
@@ -21,5 +21,5 @@ const downloader = async ({ url, name, options }) => {
 };
 
 module.exports = {
-    downloader
+    downloaderSM
 };

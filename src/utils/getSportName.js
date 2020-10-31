@@ -1,5 +1,5 @@
 const getSportNameByParserName = (parserName) => {
-    if (['ettan', 'mediabank', 'nasport'].includes(parserName)) {
+    if (['mediabank', 'nasport'].includes(parserName)) {
         return 'football';
     }
 

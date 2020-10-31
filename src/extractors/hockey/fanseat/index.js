@@ -1,42 +1,15 @@
 const moment = require('moment-timezone');
 const fetch = require('node-fetch');
-const chunkArray = require('../../../utils/chunkArray');
-const formatDate = require('../../../utils/formatDate');
-const { runCmdHandler } = require('../../../downloader');
-const { sendTelegramMessage } = require('../../../telegramBot');
-
-const { isDownloading } = require('../../../utils/readFile');
-
-const downloader = async (matchList, parserName, day) => {
-    const chunkMatches = chunkArray(matchList, 7);
-    for (let i = 0; i < chunkMatches.length; i++) {
-        await Promise.all(chunkMatches[i].map(({
-            id, name, date, url
-        }) =>
-            !isDownloading(`${parserName}/${formatDate(day)}_${name.replace(/ /g, '')}.mp4`)
-            && runCmdHandler(
-                './src/youtube-dl',
-                `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${formatDate(day)}_${name.replace(/ /g, '')}.mp4`
-            )
-        ));
-        await sendTelegramMessage({
-            league: parserName,
-            matches: chunkMatches[i]
-        });
-    }
-};
 
 const parseUrlString = thumbnail => {
     if (!thumbnail) return;
 
     const url = thumbnail.split('/');
-
     url.pop();
-
     return url.join('/');
 };
 
-const getMatchList = async ({ selectedDate }) => {
+const getMatchList = async ({ selectedDate, parserName }) => {
     try {
         const res = await fetch('https://api.staylive.tv/videos/feed?limit=100&page=1', {
             headers: {
@@ -57,7 +30,9 @@ const getMatchList = async ({ selectedDate }) => {
                 name: `${name}-${channelName}`,
                 // url: `https://stor-2.staylive.se/seodiv/${parseUrlString(url_string) || id}/720/720.m3u8`
                 // https://video-cache-sto-01.staylive.se/dggxwju/720/720.m3u8
-                url: `${parseUrlString(thumbnail)}/720/720.m3u8`
+                url: `${parseUrlString(thumbnail)}/720/720.m3u8`,
+                scrapedDate: selectedDate,
+                parserName,
             }));
     }
     catch (e) {
@@ -65,9 +40,12 @@ const getMatchList = async ({ selectedDate }) => {
     }
 };
 
-const parser = async (browser, name, limit, selectedDate) => await getMatchList({ selectedDate });
+const parser = async (browser, name, limit, selectedDate) =>
+    await getMatchList({
+        selectedDate,
+        parserName: name,
+    });
 
 module.exports = {
     parser,
-    downloader
 };

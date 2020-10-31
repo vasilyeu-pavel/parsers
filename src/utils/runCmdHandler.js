@@ -1,8 +1,10 @@
 const { spawn } = require('child_process');
 
-const spawnProcess = (dir, cmd) => ((process.platform.toLowerCase().indexOf('win') >= 0)
-    ? spawnWindowsProcess(dir, cmd)
-    : spawnLinuxProcess(dir, cmd));
+const spawnProcess = (dir, cmd) => {
+    return (process.platform.toLowerCase() === 'win32'
+        ? spawnWindowsProcess(dir, cmd)
+        : spawnLinuxProcess(dir, cmd));
+};
 
 const spawnWindowsProcess = (dir, cmd) => spawn('cmd.exe', ['/c', cmd], { cwd: dir });
 
