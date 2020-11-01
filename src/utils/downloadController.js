@@ -20,16 +20,16 @@ const downloaderController = async (matchList) => {
 };
 
 const download = async ({
-    id,
     name,
     url,
     scrapedDate,
     parserName,
+    options = "--hls-prefer-native",
 }) =>
     !isDownloading(`${parserName}/${formatDate(scrapedDate)}_${name.replace(/ /g, '')}.mp4`)
     && runCmdHandler(
     './src/youtube-dl',
-    `youtube-dl --hls-prefer-native ${url} --output ${parserName}/${formatDate(scrapedDate)}_${name.replace(/ /g, '')}.mp4`
+    `youtube-dl ${options} ${url} --output ${parserName}/${formatDate(scrapedDate)}_${name.replace(/ /g, '')}.mp4`
     );
 
 const downloadController = (matchesData) => Array.isArray(matchesData)

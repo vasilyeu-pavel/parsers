@@ -16,8 +16,6 @@ const startScraping = async (browser, parserName, day) => {
 
     const matches = await parser(browser, scraperName, 100, day, league);
 
-    console.log(matches);
-
     return await downloader(matches);
 };
 
@@ -47,23 +45,28 @@ const parsers = async () => {
                 return await browser.close();
             }
             case 'Скачать матч ydl': {
-                const { downloaderSM } = require('./src/downloadSimpleMatch');
                 console.log('Скачать матч ydl');
                 const { url, name, options } = await questionsForDownloadSimpleMatch();
-                return await downloaderSM({ url, name, options });
+                return await downloader({
+                    url,
+                    name,
+                    options,
+                    scrapedDate: new Date(),
+                    parserName: 'RANDOM',
+                });
             }
             case 'Скачать матчи из файла': {
-                const { downloaderSM } = require('./src/downloadSimpleMatch');
                 console.log('Скачать матчи из файла');
                 const chunkMatches = chunkArray(customsData(), 5);
 
                 for (const chunkUrls of chunkMatches) {
                     await Promise.all(chunkUrls.map(({ id, url }) =>
-                        downloaderSM({
+                        downloader({
                             url,
                             name: `${id}`,
-                            options: '--hls-prefer-native'
-                        }))
+                            scrapedDate: new Date(),
+                            parserName: 'RANDOM',
+                        })),
                     );
                 }
                 return
