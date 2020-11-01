@@ -43,18 +43,20 @@ const parsers = async () => {
                     startScraping(browser, parserName, day))
                 );
                 error = null;
-                return await browser.close();
+                await browser.close();
+                return parsers();
             }
             case 'Скачать матч ydl': {
                 console.log('Скачать матч ydl');
                 const { url, name, options } = await questionsForDownloadSimpleMatch();
-                return await downloader({
+                await downloader({
                     url,
                     name,
                     options,
                     scrapedDate: new Date(),
                     parserName: 'RANDOM',
                 });
+                return parsers();
             }
             case 'Скачать матчи из файла': {
                 console.log('Скачать матчи из файла');
@@ -70,7 +72,7 @@ const parsers = async () => {
                         })),
                     );
                 }
-                return
+                return parsers();
             }
             case 'Выход!': {
                 console.log('Выход!');
@@ -81,8 +83,9 @@ const parsers = async () => {
     catch (e) {
         error = e;
         console.log(error);
-        printInNewTab(e.toString())
+        printInNewTab(e.toString());
+        parsers().catch(e => console.log(e));
     }
 };
 
-parsers();
+parsers().catch(e => console.log(e));
