@@ -1,7 +1,29 @@
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
+const os = require('os');
+
+const printInNewTab = (cmd) => {
+    return (os.platform() === 'win32'
+        ? printInNewTabWindows(cmd)
+        : printInNewTabLinux(cmd));
+};
+
+const printInNewTabWindows = (message) => {
+    // cmd = /K cd /D C:/test
+    return exec(`start cmd.exe /K echo /D ${message}`)
+};
+
+const printInNewTabLinux = (message = "hello word") => {
+    const options = [
+        '-e',
+        `tell application "Terminal" to do script "echo ${message}" in selected tab of the front window`
+    ];
+    if (os.platform() == 'darwin') {
+        spawn('osascript', options)
+    }
+};
 
 const spawnProcess = (dir, cmd) => {
-    return (process.platform.toLowerCase() === 'win32'
+    return (os.platform() === 'win32'
         ? spawnWindowsProcess(dir, cmd)
         : spawnLinuxProcess(dir, cmd));
 };
@@ -57,5 +79,6 @@ const runCmdHandler = async (dir, cmd) => {
 };
 
 module.exports = {
-    runCmdHandler
+    runCmdHandler,
+    printInNewTab,
 };

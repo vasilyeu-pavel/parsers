@@ -5,6 +5,7 @@ const downloader = require('./src/utils/downloadController');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
 const { getSportNameByParserName } = require('./src/utils/getSportName');
+const { printInNewTab } = require('./src/utils/runCmdHandler');
 
 let error = null;
 
@@ -80,6 +81,7 @@ const parsers = async () => {
     catch (e) {
         error = e;
         console.log(error);
+        printInNewTab(e.toString())
     }
 };
 
