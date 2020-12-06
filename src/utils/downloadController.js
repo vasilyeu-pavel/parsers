@@ -19,22 +19,18 @@ const download = async (match) => {
         name,
         url,
         scrapedDate,
-        parserName,
+        league,
         options = "--hls-prefer-native"
     } = match;
 
-    const savedName = `${parserName}/${formatDate(scrapedDate)}_${name.replace(/ /g, '')}.mp4`;
+    const savedName = `${league}/${formatDate(scrapedDate)}_${name.replace(/ /g, '')}.mp4`;
 
     const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
 
     if (!isDownloading(savedName)) {
         await runCmdHandler('./src/youtube-dl', ydlCmd);
+        await sendTelegramMessage({ matches: [match] });
     }
-
-    await sendTelegramMessage({
-        league: "test",
-        matches: [match]
-    });
 };
 
 const downloadController = (matchesData) => Array.isArray(matchesData)
