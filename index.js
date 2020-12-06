@@ -1,24 +1,15 @@
-const puppeteer = require('puppeteer');
+const path = require('path');
+const { Worker, isMainThread } = require('worker_threads');
 const { printHeader } = require('./src/utils/printHeader');
 const chunkArray = require('./src/utils/chunkArray');
 const downloader = require('./src/utils/downloadController');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
-const { getSportNameByParserName } = require('./src/utils/getSportName');
 const { printInNewTab } = require('./src/utils/runCmdHandler');
 
+const filename = path.join(__dirname, 'src', 'startScraping.js');
+
 let error = null;
-
-const startScraping = async (browser, parserName, day) => {
-    const [scraperName, league] = parserName.split('-');
-    const sportName = getSportNameByParserName(parserName);
-
-    const { parser } = require(`./src/extractors/${sportName}/${scraperName}`);
-
-    const matches = await parser(browser, scraperName, 100, day, league);
-
-    return await downloader(matches);
-};
 
 const parsers = async () => {
     printHeader();
@@ -30,20 +21,28 @@ const parsers = async () => {
         switch (choice) {
             case 'Использовать парсеры': {
                 const { day, parsersList } = await getQuestions();
-                const browser = await puppeteer.launch({
-                    args: [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--start-maximized',
-                    ],
-                    headless: true,
-                });
+                const globalMatches = [];
 
-                await Promise.all(parsersList.map((parserName) =>
-                    startScraping(browser, parserName, day))
-                );
+                if (isMainThread) {
+                    await Promise.all(parsersList.map((parserName) => {
+                        return new Promise((resolve, reject) => {
+                            const worker = new Worker(
+                                filename,
+                                { workerData: { day, parserName } }
+                            );
+                            worker.on('error', (err) => reject(err));
+                            worker.on('message', ({ matches }) => {
+                                if (!matches) return;
+                                console.log(matches);
+                                globalMatches.push(...matches);
+                                resolve();
+                            });
+                        });
+                    }));
+                }
                 error = null;
-                await browser.close();
+
+                await downloader(globalMatches);
                 return parsers();
             }
             case 'Скачать матч ydl': {
