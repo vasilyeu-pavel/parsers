@@ -1,6 +1,6 @@
 const chunkArray = require('./chunkArray');
 const formatDate = require('./formatDate');
-const { runCmdHandler, printInNewTab } = require('./runCmdHandler');
+const { runCmdHandler } = require('./runCmdHandler');
 const { sendTelegramMessage } = require('../telegramBot');
 
 const { isDownloading } = require('./readFile');
@@ -28,8 +28,7 @@ const download = async (match) => {
     const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
 
     if (!isDownloading(savedName)) {
-        // await runCmdHandler('./src/youtube-dl', ydlCmd);
-        await printInNewTab(ydlCmd)
+        await runCmdHandler('./src/youtube-dl', ydlCmd);
     }
 
     await sendTelegramMessage({

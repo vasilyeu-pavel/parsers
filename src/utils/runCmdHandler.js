@@ -1,19 +1,10 @@
-const { spawn, exec } = require('child_process');
+const { spawn } = require('child_process');
 const os = require('os');
 
 const printInNewTab = (cmd) => {
     return (os.platform() === 'win32'
-        ? printInNewTabWindows(cmd)
+        ? spawnProcess("/", cmd)
         : printInNewTabLinux(cmd));
-};
-
-const printInNewTabWindows = (message) => {
-    return new Promise((res, rej) => {
-        exec(`start cmd.exe /K ${message}`, (error) => {
-            if (error) return rej();
-            res();
-        })
-    });
 };
 
 const printInNewTabLinux = (message = "hello word") => {
@@ -47,14 +38,9 @@ const runCmdHandler = async (dir, cmd) => {
     let isRetry = false;
 
     try {
-        process = spawnProcess(dir, cmd);
+        process = spawnProcess(dir, `start cmd.exe /K ${cmd}`);
         await new Promise((resolve, reject) => {
-            console.log('start --->', cmd);
-            process.stdout.on('data', (data) => {
-                console.log('progress', data.toString('utf-8'));
-            });
             process.stderr.on('data', (data) => {
-                console.log('error', data.toString('utf-8'));
                 if (data.toString('utf-8').includes('Did not get any data blocks')) {
                     reject(data.toString('utf-8'));
                 }
