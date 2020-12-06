@@ -8,17 +8,24 @@ const printInNewTab = (cmd) => {
 };
 
 const printInNewTabWindows = (message) => {
-    // cmd = /K cd /D C:/test
-    return exec(`start cmd.exe /K echo /D ${message}`)
+    return new Promise((res, rej) => {
+        exec(`start cmd.exe /K ${message}`, (error) => {
+            if (error) return rej();
+            res();
+        })
+    });
 };
 
 const printInNewTabLinux = (message = "hello word") => {
     const options = [
         '-e',
-        `tell application "Terminal" to do script "echo ${message}" in selected tab of the front window`
+        `tell application "Terminal" to do script "${message}" in selected tab of the front window`
     ];
-    if (os.platform() == 'darwin') {
-        spawn('osascript', options)
+    if (os.platform() === 'darwin') {
+        return new Promise((res) => {
+            spawn('osascript', options)
+                .on('exit', () => res());
+        })
     }
 };
 

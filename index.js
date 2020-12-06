@@ -82,7 +82,7 @@ const parsers = async () => {
     catch (e) {
         error = e;
         console.log(error);
-        printInNewTab(e.toString());
+        printInNewTab(`echo /D ${e.toString()}`);
         parsers().catch(e => console.log(e));
     }
 };
