@@ -5,7 +5,6 @@ const chunkArray = require('./src/utils/chunkArray');
 const downloader = require('./src/utils/downloadController');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
-const { printInNewTab } = require('./src/utils/runCmdHandler');
 
 const filename = path.join(__dirname, 'src', 'startScraping.js');
 
@@ -82,7 +81,6 @@ const parsers = async () => {
     catch (e) {
         error = e;
         console.log(error);
-        printInNewTab(`echo /D ${e.toString()}`);
         parsers().catch(e => console.log(e));
     }
 };

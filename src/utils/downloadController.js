@@ -24,7 +24,10 @@ const download = async (match) => {
     const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(" ");
 
     if (!isDownloading(savedName)) {
-        await runCmdHandler('/', `start cmd.exe /K node startDownload.js ${options}`);
+        await runCmdHandler(
+            '/parsers/src/',
+            `start cmd.exe /K node startDownload.js ${options}`
+        );
     }
 };
 

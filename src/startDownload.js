@@ -18,7 +18,7 @@ const startDownload = async () => {
 
     const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
 
-    await runCmdHandler('./src/youtube-dl', ydlCmd);
+    await runCmdHandler('/parsers/src/youtube-dl', ydlCmd);
 
     await sendTelegramMessage({ matches: [process.argv] });
 

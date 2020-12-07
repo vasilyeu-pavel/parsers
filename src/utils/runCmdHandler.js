@@ -1,32 +1,6 @@
-const { spawn, exec } = require('child_process');
+const { spawn } = require('child_process');
 const os = require('os');
 
-const printInNewTab = (cmd) => {
-    return (os.platform() === 'win32'
-        ? printInNewTabWindows(cmd)
-        : printInNewTabLinux(cmd));
-};
-
-const printInNewTabWindows = (message) => {
-    return new Promise((res, rej) => {
-        exec(`start cmd.exe /K ${message}`, (error) => {
-            if (error) return rej();
-        })
-    });
-};
-
-const printInNewTabLinux = (message = "hello word") => {
-    const options = [
-        '-e',
-        `tell application "Terminal" to do script "${message}" in selected tab of the front window`
-    ];
-    if (os.platform() === 'darwin') {
-        return new Promise((res) => {
-            spawn('osascript', options)
-                .on('exit', () => res());
-        })
-    }
-};
 
 const spawnProcess = (dir, cmd) => {
     return (os.platform() === 'win32'
@@ -84,7 +58,4 @@ const runCmdHandler = async (dir, cmd) => {
     }
 };
 
-module.exports = {
-    runCmdHandler,
-    printInNewTab,
-};
+module.exports = { runCmdHandler };
