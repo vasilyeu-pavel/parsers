@@ -1,7 +1,6 @@
 const chunkArray = require('./chunkArray');
 const formatDate = require('./formatDate');
 const { runCmdHandler } = require('./runCmdHandler');
-const { sendTelegramMessage } = require('../telegramBot');
 
 const { isDownloading } = require('./readFile');
 
@@ -17,19 +16,15 @@ const downloaderController = async (matchList) => {
 const download = async (match) => {
     const {
         name,
-        url,
-        scrapedDate,
         league,
-        options = "--hls-prefer-native"
+        date,
     } = match;
 
-    const savedName = `${league}/${formatDate(scrapedDate)}_${name.replace(/ /g, '')}.mp4`;
-
-    const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
+    const savedName = `${league}/${formatDate(date)}_${name.replace(/ /g, '')}.mp4`;
+    const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(" ");
 
     if (!isDownloading(savedName)) {
-        await runCmdHandler('./src/youtube-dl', ydlCmd);
-        await sendTelegramMessage({ matches: [match] });
+        await runCmdHandler('/', `start cmd.exe /K node startDownload.js ${options}`);
     }
 };
 

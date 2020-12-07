@@ -46,7 +46,7 @@ const runCmdHandler = async (dir, cmd) => {
     let isRetry = false;
 
     try {
-        process = spawnProcess(dir, `start cmd.exe /K ${cmd}`);
+        process = spawnProcess(dir, cmd);
         await new Promise((resolve, reject) => {
             console.log('start --->', cmd);
             process.stdout.on('data', (data) => {
