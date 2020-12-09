@@ -1,13 +1,16 @@
 const ipc = require('node-ipc');
 
-const { MAIN_PROCESS } = require('./constants');
-const { parseArgv, delay } = require("./utils");
+const { MAIN_PROCESS, PROCESS } = require('./constants');
+const { parseArgv } = require("./utils");
 const { sendTelegramMessage } = require('./telegramBot');
 const formatDate = require('./utils/formatDate');
 const { runCmdHandler } = require('./utils/runCmdHandler');
 
+ipc.config.id = `${process.pid}`;
+ipc.config.retry = 1500;
+ipc.config.silent = true;
 
-const startDownload = () => {
+const startDownload = async () => {
     const match = parseArgv(process.argv);
     const {
         name,
@@ -25,24 +28,19 @@ const startDownload = () => {
 
     const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
 
-    ipc.config.id = `${process.pid}`;
-    ipc.config.retry = 1500;
-    ipc.config.silent = true;
-    ipc.connectTo(MAIN_PROCESS, () => {
-        ipc.of['jest-observer'].on('connect', async () => {
+    await runCmdHandler('/parsers/src/youtube-dl', ydlCmd);
 
-            await runCmdHandler('/parsers/src/youtube-dl', ydlCmd);
+    await sendTelegramMessage({ matches: [match] });
 
-            await sendTelegramMessage({ matches: [match] });
-
-            await delay(5000);
-            console.log('Exiting.');
-
-            ipc.of['jest-observer'].emit(index || 1, matchName);
-
-            process.kill(process.pid);
-        });
-    });
+    return { index, matchName };
 };
 
-startDownload();
+ipc.connectTo(MAIN_PROCESS, () => {
+    ipc.of[MAIN_PROCESS].on('connect', async () => {
+        const { matchName, index } = await startDownload();
+        console.log(index, matchName);
+        ipc.of[MAIN_PROCESS].emit(PROCESS[index], matchName);
+        console.log('Exiting.');
+        process.kill(process.pid);
+    });
+});

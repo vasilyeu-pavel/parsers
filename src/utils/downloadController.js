@@ -3,18 +3,25 @@ const ipc = require('node-ipc');
 const chunkArray = require('./chunkArray');
 const formatDate = require('./formatDate');
 const { runCmdHandler } = require('./runCmdHandler');
-const { MAIN_PROCESS } = require('../constants');
+const { MAIN_PROCESS, PROCESS } = require('../constants');
 const { isDownloading } = require('./readFile');
 
 ipc.config.id = MAIN_PROCESS;
 ipc.config.retry = 1500;
 ipc.config.silent = true;
 
-[1,2,3,4].forEach((i) => {
-    ipc.serve(() => ipc.server.on(i, message => {
-        console.log(message);
-    }));
-});
+ipc.serve(() => ipc.server.on(PROCESS[0], message => {
+    console.log(message);
+}));
+ipc.serve(() => ipc.server.on(PROCESS[1], message => {
+    console.log(message);
+}));
+ipc.serve(() => ipc.server.on(PROCESS[2], message => {
+    console.log(message);
+}));
+ipc.serve(() => ipc.server.on(PROCESS[3], message => {
+    console.log(message);
+}));
 
 ipc.server.start();
 
