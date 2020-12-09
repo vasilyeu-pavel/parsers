@@ -3,23 +3,14 @@ const ipc = require('node-ipc');
 const chunkArray = require('./chunkArray');
 const formatDate = require('./formatDate');
 const { runCmdHandler } = require('./runCmdHandler');
-const { MAIN_PROCESS, PROCESS } = require('../constants');
+const { MAIN_PROCESS, PROCESS_CHANEL } = require('../constants');
 const { isDownloading } = require('./readFile');
 
 ipc.config.id = MAIN_PROCESS;
 ipc.config.retry = 1500;
 ipc.config.silent = true;
 
-ipc.serve(() => ipc.server.on(PROCESS[0], message => {
-    console.log(message);
-}));
-ipc.serve(() => ipc.server.on(PROCESS[1], message => {
-    console.log(message);
-}));
-ipc.serve(() => ipc.server.on(PROCESS[2], message => {
-    console.log(message);
-}));
-ipc.serve(() => ipc.server.on(PROCESS[3], message => {
+ipc.serve(() => ipc.server.on(PROCESS_CHANEL, message => {
     console.log(message);
 }));
 
@@ -31,22 +22,15 @@ const downloaderController = async (matchList) => {
     const chunkMatches = chunkArray(matchList, 4);
 
     for (let i = 0; i < chunkMatches.length; i++) {
-        await Promise.all(chunkMatches[i]
-            .map((match) => download({ ...match, index: i }))
+        await Promise.all(chunkMatches[i].map(download)
         );
     }
 };
 
 const download = async (match) => {
-    const {
-        name,
-        league,
-        date,
-        index,
-    } = match;
+    const { name, league, date } = match;
 
     const matchName = name.replace(/ /g, '');
-
     const savedName = `${league}/${formatDate(date)}_${matchName}.mp4`;
     const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(" ");
 

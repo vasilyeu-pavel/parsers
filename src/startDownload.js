@@ -1,6 +1,6 @@
 const ipc = require('node-ipc');
 
-const { MAIN_PROCESS, PROCESS } = require('./constants');
+const { MAIN_PROCESS, PROCESS_CHANEL } = require('./constants');
 const { parseArgv } = require("./utils");
 const { sendTelegramMessage } = require('./telegramBot');
 const formatDate = require('./utils/formatDate');
@@ -18,7 +18,6 @@ const startDownload = async () => {
         date,
         league,
         options = "--hls-prefer-native",
-        index,
     } = match;
     console.log(`This process is pid ${process.pid}`);
 
@@ -32,14 +31,16 @@ const startDownload = async () => {
 
     await sendTelegramMessage({ matches: [match] });
 
-    return { index, matchName };
+    return { matchName };
 };
 
 ipc.connectTo(MAIN_PROCESS, () => {
     ipc.of[MAIN_PROCESS].on('connect', async () => {
-        const { matchName, index } = await startDownload();
-        console.log(index, matchName);
-        ipc.of[MAIN_PROCESS].emit(PROCESS[index], matchName);
+        const { matchName } = await startDownload();
+        console.log(matchName);
+
+        ipc.of[MAIN_PROCESS].emit(PROCESS_CHANEL, matchName);
+
         console.log('Exiting.');
         process.kill(process.pid);
     });
