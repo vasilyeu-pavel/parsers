@@ -1,5 +1,4 @@
 const { download } = require("./downloadController");
-const chunkArray = require("./chunkArray");
 
 class Queue {
     constructor() {
@@ -27,19 +26,7 @@ class Queue {
             this.queues[name].status === "PROGRESS"
         );
 
-        if (progress.length === 0) {
-            const pendingJobsName = chunkArray(jobsName.filter((name) =>
-                this.queues[name].status === "PENDING"
-            ), 4);
-
-            Promise.all(pendingJobsName.map(pendingJobName => {
-                this.queues[pendingJobName].status = "PROGRESS";
-                download(this.queues[pendingJobName]);
-                return Promise.resolve();
-            })).catch((e) => console.log(e))
-        }
-
-        if (progress.length && progress.length < 4) {
+        if (progress.length < 4) {
             const [pendingJobName] = jobsName.filter((name) =>
                 this.queues[name].status === "PENDING"
             );
