@@ -1,10 +1,25 @@
 const path = require('path');
+const ipc = require('node-ipc');
 const { Worker, isMainThread } = require('worker_threads');
 const { printHeader } = require('./src/utils/printHeader');
+const Queue = require('./src/utils/queue');
 const chunkArray = require('./src/utils/chunkArray');
-const downloader = require('./src/utils/downloadController');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
+const { MAIN_PROCESS, PROCESS_CHANEL } = require('./src/constants');
+
+const queue = new Queue();
+
+ipc.config.id = MAIN_PROCESS;
+ipc.config.retry = 1500;
+ipc.config.silent = true;
+
+ipc.serve(() => ipc.server.on(PROCESS_CHANEL, jobName => {
+    console.log(jobName);
+    queue.onComplete(jobName)
+}));
+
+ipc.server.start();
 
 const filename = path.join(__dirname, 'src', 'startScraping.js');
 
@@ -41,13 +56,13 @@ const parsers = async () => {
                 }
                 error = null;
 
-                await downloader(globalMatches);
+                queue.push(globalMatches);
                 return parsers();
             }
             case 'Скачать матч ydl': {
                 console.log('Скачать матч ydl');
                 const { url, name, options } = await questionsForDownloadSimpleMatch();
-                await downloader({
+                queue.push({
                     url,
                     name,
                     options,
@@ -61,20 +76,24 @@ const parsers = async () => {
                 const chunkMatches = chunkArray(customsData(), 5);
 
                 for (const chunkUrls of chunkMatches) {
-                    await Promise.all(chunkUrls.map(({ id, url }) =>
-                        downloader({
+                    await Promise.all(chunkUrls.map(({ id, url }) => {
+                        queue.push({
                             url,
                             name: `${id}`,
                             scrapedDate: new Date(),
                             parserName: 'RANDOM',
-                        })),
+                        });
+                        return Promise.resolve();
+                    }),
                     );
                 }
                 return parsers();
             }
             case 'Выход!': {
                 console.log('Выход!');
+                process.kill(process.pid);
                 break;
+
             }
         }
     }
