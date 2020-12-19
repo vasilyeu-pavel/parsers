@@ -5,12 +5,10 @@ const config = {
     chatId: 405898308
 };
 
-const createMessage = ({ league, matches }) => {
-    if (!league) return 'league.length - 0';
-
+const createMessage = ({ matches }) => {
     if (!matches) return 'matches - 0';
 
-    return `[#Скачались матчи] *(${league})*:
+    return `[#Скачались матчи]:
         ${matches.map(({ name = '', date = '' }, i) => `\n${i + 1}) *${date}_${name.replace(/ /g, '')}*`)}
     `;
 };

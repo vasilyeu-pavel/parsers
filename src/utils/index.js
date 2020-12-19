@@ -1,3 +1,4 @@
+const { parseArgv } = require('./parseArgv');
 const config = require('../../config');
 
 const blockedResourceTypes = [
@@ -140,10 +141,14 @@ const cookiesParser = (cookies, taretName = 'gatling_token') => {
     return str;
 };
 
+const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
 module.exports = {
     auth,
     getCookies,
     getPage,
     getFrame,
     cookiesParser,
+    parseArgv,
+    delay,
 };

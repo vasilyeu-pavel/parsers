@@ -1,8 +1,12 @@
 const { spawn } = require('child_process');
+const os = require('os');
 
-const spawnProcess = (dir, cmd) => ((process.platform.toLowerCase().indexOf('win') >= 0)
-    ? spawnWindowsProcess(dir, cmd)
-    : spawnLinuxProcess(dir, cmd));
+
+const spawnProcess = (dir, cmd) => {
+    return (os.platform() === 'win32'
+        ? spawnWindowsProcess(dir, cmd)
+        : spawnLinuxProcess(dir, cmd));
+};
 
 const spawnWindowsProcess = (dir, cmd) => spawn('cmd.exe', ['/c', cmd], { cwd: dir });
 
@@ -54,6 +58,4 @@ const runCmdHandler = async (dir, cmd) => {
     }
 };
 
-module.exports = {
-    runCmdHandler
-};
+module.exports = { runCmdHandler };

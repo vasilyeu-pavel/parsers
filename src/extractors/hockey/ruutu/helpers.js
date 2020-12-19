@@ -12,7 +12,7 @@ const getAuthToken = async (
         parserName
     }
 ) => {
-       try {
+      try {
         await page.evaluate((selector) => document.querySelector(selector).click(), signInSelector);
     } catch (e) {
         console.log('====signInSelector====', e)

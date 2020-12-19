@@ -1,13 +1,7 @@
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
-const jsdom = require('jsdom');
 
-const formatDate = require('../../../utils/formatDate');
-const chunkArray = require('../../../utils/chunkArray');
 const config = require('../../../../config');
-
-const { runCmdHandler } = require('../../../downloader');
-const { sendTelegramMessage } = require('../../../telegramBot');
 
 const getEventList = async (id, day) => {
     const res = await fetch(`https://services.api.no/api/hjallis/v2/front?sport=${id}`);
@@ -68,50 +62,34 @@ const getLinkIds = (videoIds) => new Promise((resolve) => {
     }))).then((res) => resolve(res));
 });
 
-const getUrls = async (id, day) => {
+const getUrls = async (id, day, parserName) => {
     const eventList = await getEventList(id, day);
     const videoIds = await getVideoIds(eventList);
-    console.log(eventList);
-
     const events = await getLinkIds(videoIds.filter((videoId) => Object.keys(videoId).length));
-    return chunkArray(events.map(({
+
+    return events.map(({
         linkId, start, name, league
     }) => ({
         url: `https://lw-amedia-cf.lwcdn.com/hls/${linkId}/playlist.m3u8`,
         name,
         date: start,
-        ID: linkId,
-        league
-    })), 10);
+        id: linkId,
+        league,
+        scrapedDate: day,
+        parserName,
+    }));
 };
 
-const { isDownloading } = require('../../../utils/readFile');
-
-const downloader = async (urls, parserName) => {
-    for (const chunkUrls of urls) {
-        await Promise.all(chunkUrls.map((url) =>
-            !isDownloading(`${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g, '')}.mp4`)
-            && runCmdHandler(
-            './src/youtube-dl',
-            `youtube-dl --hls-prefer-native ${url.url} --output ${parserName}/${formatDate(url.date)}_${url.name.replace(/ /g, '')}.mp4`
-        )));
-        await sendTelegramMessage({
-            league: parserName,
-            matches: chunkUrls
-        });
-    }
-};
-
-const controller = async ({ id }, day) => await getUrls(id, day);
+const controller = async ({ id }, day, name) => await getUrls(id, day, name);
 
 const parser = async (browser, name, limit, day) => {
     const { sports } = config[name];
 
     for (const sport of sports) {
-        return await controller(sport, day);
+        return await controller(sport, day, name);
     }
 };
 
 module.exports = {
-    downloader, parser
+    parser
 };
