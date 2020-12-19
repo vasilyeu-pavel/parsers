@@ -1,15 +1,11 @@
 const moment = require('moment-timezone');
 const fetch = require('node-fetch');
+const config = require('../../../../config');
+const { auth, getPage, getCookies, cookiesParser } = require('../../../utils');
 
-const parseUrlString = thumbnail => {
-    if (!thumbnail) return;
+const TOKEN = 'x-staylive-token';
 
-    const url = thumbnail.split('/');
-    url.pop();
-    return url.join('/');
-};
-
-const getMatchList = async ({ selectedDate, parserName }) => {
+const getMatchList = async ({ selectedDate, parserName, token }) => {
     try {
         const res = await fetch('https://api.staylive.tv/videos/feed?limit=100&page=1', {
             headers: {
@@ -20,31 +16,63 @@ const getMatchList = async ({ selectedDate, parserName }) => {
 
         if (!message || !message.length) return [];
 
-        return message
-            .filter(({ created_at }) => moment(created_at).format('YYYY-MM-DD') === moment(selectedDate).format('YYYY-MM-DD'))
-            .map(({
-                id, created_at, name, channelName, url_string, thumbnail
-            }) => ({
-                id,
-                date: moment(created_at).format('YYYY-MM-DD'),
-                name: `${name}-${channelName}`,
-                // url: `https://stor-2.staylive.se/seodiv/${parseUrlString(url_string) || id}/720/720.m3u8`
-                // https://video-cache-sto-01.staylive.se/dggxwju/720/720.m3u8
-                url: `${parseUrlString(thumbnail)}/720/720.m3u8`,
-                scrapedDate: selectedDate,
-                parserName,
-            }));
+        const filteredMatches = message
+            .filter(({ created_at }) => moment(created_at).format('YYYY-MM-DD') === moment(selectedDate).format('YYYY-MM-DD'));
+
+        if (!filteredMatches.length) return [];
+
+        const matches = await Promise.all(filteredMatches.map(async (match) => {
+            const response = await fetch(`https://api.staylive.tv/videos/${match.id}`, {
+                headers: {
+                    [TOKEN]: token,
+                }
+            });
+            const { message: res } = await response.json();
+
+            return {
+                ...match,
+                url: res.playback_url
+            }
+        }));
+
+
+        return matches.map(({ id, created_at, name, channelName, url }) => ({
+            id,
+            date: moment(created_at).format('YYYY-MM-DD'),
+            name: `${name}-${channelName}`,
+            scrapedDate: selectedDate,
+            parserName,
+            url,
+        }));
     }
     catch (e) {
+        console.log(e);
         throw new Error('ошибка в запросе за списком матчей fanseat');
     }
 };
 
-const parser = async (browser, name, limit, selectedDate) =>
-    await getMatchList({
+const parser = async (browser, name, limit, selectedDate) => {
+    const { url } = config[name];
+
+    const page = await getPage(browser, url);
+
+    await auth(page, name);
+
+    await page.waitFor(5000);
+
+    // get cookies
+    const cookies = await getCookies(page);
+
+    const token = cookiesParser(cookies, TOKEN);
+
+    if (!token) return [];
+
+    return await getMatchList({
         selectedDate,
         parserName: name,
+        token: token.split(TOKEN)[1].slice(1),
     });
+};
 
 module.exports = {
     parser,

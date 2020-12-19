@@ -52,10 +52,10 @@ const auth = async (page, parserName) => {
     const passwordInput = await page.$(passwordSelector);
     await passwordInput.type(password);
 
-    // await page.waitForSelector(submitButton);
-    await page.waitFor(500);
-    const btn = await page.$(submitButton);
-    btn.click();
+    await page.waitForSelector(submitButton);
+    await page.waitFor(2000);
+
+    await page.click(submitButton);
 };
 
 const getFrame = async (page, { frameName, parserName }) => {
