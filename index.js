@@ -2,13 +2,11 @@ const path = require('path');
 const ipc = require('node-ipc');
 const { Worker, isMainThread } = require('worker_threads');
 const { printHeader } = require('./src/utils/printHeader');
-const Queue = require('./src/utils/queue');
+const { queue } = require('./src/utils/queue');
 const chunkArray = require('./src/utils/chunkArray');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./src/constants');
-
-const queue = new Queue();
 
 ipc.config.id = MAIN_PROCESS;
 ipc.config.retry = 1500;

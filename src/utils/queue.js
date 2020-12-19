@@ -1,8 +1,10 @@
 const { download } = require("./downloadController");
+const chunkArray = require("./chunkArray");
 
 class Queue {
     constructor() {
         this.queues = {};
+        this._max = 4;
     }
 
     push = (jobs) => {
@@ -19,21 +21,36 @@ class Queue {
         this.start()
     };
 
-    start = () => {
-        const jobsName = Object.keys(this.queues);
+    runJob = (pendingJobName) => {
+        const job = this.queues[pendingJobName];
 
-        const progress = jobsName.filter((name) =>
-            this.queues[name].status === "PROGRESS"
-        );
-
-        if (progress.length < 4) {
-            const [pendingJobName] = jobsName.filter((name) =>
-                this.queues[name].status === "PENDING"
-            );
-
+        if (job) {
             this.queues[pendingJobName].status = "PROGRESS";
+
             download(this.queues[pendingJobName]);
         }
+    };
+
+    start = () => {
+        let threadsCount = 4;
+
+        const jobsName = Object.keys(this.queues);
+
+        const progress = jobsName.filter((name) => this.queues[name].status === "PROGRESS");
+
+        if (progress.length >= this._max) return;
+
+        if (progress.length < this._max) {
+            threadsCount =  this._max - progress.length
+        }
+
+        const pendingJobsNames = jobsName.filter((name) => this.queues[name].status === "PENDING");
+        if (!pendingJobsNames || !pendingJobsNames.length) return;
+
+        const [chunk] = chunkArray(pendingJobsNames, threadsCount);
+
+        if (!chunk || !Array.isArray(chunk)) return;
+        chunk.forEach(this.runJob);
     };
 
     onComplete = async (name) => {
@@ -42,4 +59,4 @@ class Queue {
     }
 }
 
-module.exports = Queue;
+module.exports = { queue: new Queue };
