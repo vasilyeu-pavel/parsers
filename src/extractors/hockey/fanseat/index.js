@@ -29,9 +29,11 @@ const getMatchList = async ({ selectedDate, parserName, token }) => {
             });
             const { message: res } = await response.json();
 
+            const url = res.playback_url || "";
+
             return {
                 ...match,
-                url: res.playback_url
+                url: url.split("playlist")[0] + "720/720.m3u8"
             }
         }));
 
@@ -41,7 +43,7 @@ const getMatchList = async ({ selectedDate, parserName, token }) => {
             date: moment(created_at).format('YYYY-MM-DD'),
             name: `${name}-${channelName}`,
             scrapedDate: selectedDate,
-            parserName,
+            league: parserName,
             url,
         }));
     }
@@ -56,9 +58,9 @@ const parser = async (browser, name, limit, selectedDate) => {
 
     const page = await getPage(browser, url);
 
-    await auth(page, name);
+    await auth(page, name, true);
 
-    await page.waitFor(5000);
+    await page.waitFor(2000);
 
     // get cookies
     const cookies = await getCookies(page);

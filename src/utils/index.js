@@ -37,7 +37,7 @@ const skippedResources = [
     'jquery'
 ];
 
-const auth = async (page, parserName) => {
+const auth = async (page, parserName, isPageClick) => {
     const {
         login, password, loginSelector, passwordSelector, submitButton
     } = config[parserName];
@@ -52,10 +52,15 @@ const auth = async (page, parserName) => {
     const passwordInput = await page.$(passwordSelector);
     await passwordInput.type(password);
 
-    await page.waitForSelector(submitButton);
-    await page.waitFor(2000);
+    // await page.waitForSelector(submitButton);
+    await page.waitFor(500);
 
-    await page.click(submitButton);
+    if (!isPageClick) {
+        const btn = await page.$(submitButton);
+        await btn.click();
+    } else {
+        await page.click(submitButton);
+    }
 };
 
 const getFrame = async (page, { frameName, parserName }) => {
