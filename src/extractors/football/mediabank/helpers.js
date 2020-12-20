@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const FormData = require('form-data');
-const formatDate = require('../../../utils/formatDate');
+const { formatDate } = require('../../../utils');
 
 const cookiesParser = (coockies) => {
     const arrFiltered = coockies.filter((el) => el.name === '_ga' || el.name === '__zlcmid' || el.name === 'Mediabank_' || el.name === 'server-id');

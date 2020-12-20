@@ -6,6 +6,4 @@ const getSportNameByParserName = (parserName) => {
     return 'hockey';
 };
 
-module.exports = {
-    getSportNameByParserName
-};
+module.exports = getSportNameByParserName;

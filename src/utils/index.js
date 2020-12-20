@@ -1,5 +1,17 @@
-const { parseArgv } = require('./parseArgv');
+const parseArgv = require('./parseArgv');
 const config = require('../../config');
+const chunkArray = require('./chunkArray');
+const download = require('./downloadController');
+const formatDate = require('./formatDate');
+const getDirs = require('./getDirs');
+const getSportNameByParserName = require('./getSportName');
+const printHeader = require('./printHeader');
+const { queue } = require('./queue');
+const { runCmdHandler } = require('./runCmdHandler');
+const {
+    readFile,
+    isDownloading,
+} = require('./readFile');
 
 const blockedResourceTypes = [
     'image',
@@ -37,7 +49,7 @@ const skippedResources = [
     'jquery'
 ];
 
-const auth = async (page, parserName, isPageClick) => {
+const auth = async (page, parserName, submitCb) => {
     const {
         login, password, loginSelector, passwordSelector, submitButton
     } = config[parserName];
@@ -55,11 +67,11 @@ const auth = async (page, parserName, isPageClick) => {
     // await page.waitForSelector(submitButton);
     await page.waitFor(500);
 
-    if (!isPageClick) {
+    if (!submitCb) {
         const btn = await page.$(submitButton);
         await btn.click();
     } else {
-        await page.click(submitButton);
+        await submitCb(submitButton)
     }
 };
 
@@ -156,4 +168,14 @@ module.exports = {
     cookiesParser,
     parseArgv,
     delay,
+    chunkArray,
+    download,
+    formatDate,
+    getDirs,
+    getSportNameByParserName,
+    printHeader,
+    queue,
+    readFile,
+    isDownloading,
+    runCmdHandler,
 };

@@ -15,6 +15,4 @@ const printHeader = () => {
     );
 };
 
-module.exports = {
-    printHeader
-};
+module.exports = printHeader;

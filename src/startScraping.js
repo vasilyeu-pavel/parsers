@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer');
 const { parentPort, workerData } = require('worker_threads');
-
-const { getSportNameByParserName } = require('./utils/getSportName');
+const { getSportNameByParserName } = require('./utils');
 
 const { parserName, day } = workerData;
 

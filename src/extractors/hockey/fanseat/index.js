@@ -29,11 +29,11 @@ const getMatchList = async ({ selectedDate, parserName, token }) => {
             });
             const { message: res } = await response.json();
 
-            const url = res.playback_url || "";
+            const url = res.playback_url || '';
 
             return {
                 ...match,
-                url: url.split("playlist")[0] + "720/720.m3u8"
+                url: url.split('playlist')[0] + '720/720.m3u8'
             }
         }));
 
@@ -58,7 +58,9 @@ const parser = async (browser, name, limit, selectedDate) => {
 
     const page = await getPage(browser, url);
 
-    await auth(page, name, true);
+    const submitCb = async (submitButton) => await page.click(submitButton)
+
+    await auth(page, name, submitCb);
 
     await page.waitFor(2000);
 

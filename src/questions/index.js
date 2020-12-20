@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const { getDirs } = require('../utils/getDirs');
+const { getDirs } = require('../utils');
 
 inquirer.registerPrompt('datetime', require('inquirer-datepicker-prompt'));
 

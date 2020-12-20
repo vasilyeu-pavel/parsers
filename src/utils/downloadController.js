@@ -7,7 +7,7 @@ const download = async (match) => {
 
     const matchName = name.replace(/ /g, '');
     const savedName = `${league}/${formatDate(date)}_${matchName}.mp4`;
-    const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(" ");
+    const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(' ');
 
     if (!isDownloading(savedName)) {
         runCmdHandler(
@@ -17,4 +17,4 @@ const download = async (match) => {
     }
 };
 
-module.exports = { download };
+module.exports = download;

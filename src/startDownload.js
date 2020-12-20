@@ -1,10 +1,7 @@
 const ipc = require('node-ipc');
-
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./constants');
-const { parseArgv } = require("./utils");
 const { sendTelegramMessage } = require('./telegramBot');
-const formatDate = require('./utils/formatDate');
-const { runCmdHandler } = require('./utils/runCmdHandler');
+const { formatDate, runCmdHandler, parseArgv } = require('./utils');
 
 ipc.config.id = `${process.pid}`;
 ipc.config.retry = 1500;
@@ -17,7 +14,7 @@ const startDownload = async () => {
         url,
         date,
         league,
-        options = "--hls-prefer-native",
+        options = '--hls-prefer-native',
     } = match;
     console.log(`This process is pid ${process.pid}`);
 

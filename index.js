@@ -1,9 +1,7 @@
 const path = require('path');
 const ipc = require('node-ipc');
 const { Worker, isMainThread } = require('worker_threads');
-const { printHeader } = require('./src/utils/printHeader');
-const { queue } = require('./src/utils/queue');
-const chunkArray = require('./src/utils/chunkArray');
+const { printHeader, queue } = require('./src/utils');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./src/constants');
@@ -71,20 +69,14 @@ const parsers = async () => {
             }
             case 'Скачать матчи из файла': {
                 console.log('Скачать матчи из файла');
-                const chunkMatches = chunkArray(customsData(), 5);
 
-                for (const chunkUrls of chunkMatches) {
-                    await Promise.all(chunkUrls.map(({ id, url }) => {
-                        queue.push({
-                            url,
-                            name: `${id}`,
-                            scrapedDate: new Date(),
-                            parserName: 'RANDOM',
-                        });
-                        return Promise.resolve();
-                    }),
-                    );
-                }
+                queue.push(customsData().map(({ id, url }) => ({
+                    url,
+                    name: `${id}`,
+                    scrapedDate: new Date(),
+                    parserName: 'RANDOM',
+                })));
+
                 return parsers();
             }
             case 'Выход!': {

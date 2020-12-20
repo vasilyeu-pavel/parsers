@@ -18,6 +18,4 @@ const parseArgv = (argv) => argv
         return obj;
     }, {});
 
-module.exports = {
-    parseArgv
-};
+module.exports = parseArgv;
