@@ -10,8 +10,10 @@ const { queue } = require('./queue');
 const { runCmdHandler } = require('./runCmdHandler');
 const {
     readFile,
-    isDownloading,
+    isDownloading
 } = require('./readFile');
+const abort = require('./abort');
+const Logger = require('./logger');
 
 const blockedResourceTypes = [
     'image',
@@ -70,8 +72,9 @@ const auth = async (page, parserName, submitCb) => {
     if (!submitCb) {
         const btn = await page.$(submitButton);
         await btn.click();
-    } else {
-        await submitCb(submitButton)
+    }
+    else {
+        await submitCb(submitButton);
     }
 };
 
@@ -100,7 +103,6 @@ const getFrame = async (page, { frameName, parserName }) => {
 
     return frames[frameName];
 };
-
 
 const getCookies = async (page) => await page.cookies();
 
@@ -158,7 +160,12 @@ const cookiesParser = (cookies, taretName = 'gatling_token') => {
     return str;
 };
 
-const delay = (ms) => new Promise(res => setTimeout(res, ms));
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+const getSavedName = ({ league, date, name }) => {
+    const matchName = name.replace(/ /g, '');
+    return `${league}/${formatDate(date)}_${matchName}.mp4`;
+};
 
 module.exports = {
     auth,
@@ -178,4 +185,7 @@ module.exports = {
     readFile,
     isDownloading,
     runCmdHandler,
+    abort,
+    getSavedName,
+    Logger
 };

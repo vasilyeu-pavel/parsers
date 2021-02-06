@@ -12,10 +12,11 @@ const getAuthToken = async (
         parserName
     }
 ) => {
-      try {
+    try {
         await page.evaluate((selector) => document.querySelector(selector).click(), signInSelector);
-    } catch (e) {
-        console.log('====signInSelector====', e)
+    }
+    catch (e) {
+        console.log('====signInSelector====', e);
     }
 
     await page.waitFor(3000);
@@ -131,6 +132,8 @@ const getMatches = async (gatling_token = 'gatling_token', d = convertDate(new D
 
         matchesToDownload.push({
             ...matchOptions,
+            league,
+            name: matchOptions.name.replace(/ /g, ''),
             url: urlWithToken
         });
     }
@@ -145,7 +148,6 @@ const convertDate = (targetDate) => {
 
     return `${d}.${m}.`;
 };
-
 
 module.exports = {
     getAuthToken,

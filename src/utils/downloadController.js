@@ -1,12 +1,11 @@
 const formatDate = require('./formatDate');
 const { runCmdHandler } = require('./runCmdHandler');
 const { isDownloading } = require('./readFile');
+const { getSavedName } = require('./index');
 
 const download = async (match) => {
-    const { name, league, date } = match;
+    const savedName = getSavedName(match);
 
-    const matchName = name.replace(/ /g, '');
-    const savedName = `${league}/${formatDate(date)}_${matchName}.mp4`;
     const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(' ');
 
     if (!isDownloading(savedName)) {

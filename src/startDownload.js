@@ -1,7 +1,7 @@
 const ipc = require('node-ipc');
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./constants');
 const { sendTelegramMessage } = require('./telegramBot');
-const { formatDate, runCmdHandler, parseArgv } = require('./utils');
+const { formatDate, runCmdHandler, parseArgv, getSavedName } = require('./utils');
 
 ipc.config.id = `${process.pid}`;
 ipc.config.retry = 1500;
@@ -12,17 +12,15 @@ const startDownload = async () => {
     const {
         name,
         url,
-        date,
-        league,
-        options = '--hls-prefer-native',
+        options = '--hls-prefer-native'
     } = match;
     console.log(`This process is pid ${process.pid}`);
 
     const matchName = name.replace(/ /g, '');
 
-    const savedName = `${league}/${formatDate(date)}_${matchName}.mp4`;
+    const savedName = getSavedName(match);
 
-    const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
+    const ydlCmd = `youtube-dl ${options.split('_').join(' ')} ${url} --output ${savedName}`;
 
     await runCmdHandler('/parsers/src/youtube-dl', ydlCmd);
 

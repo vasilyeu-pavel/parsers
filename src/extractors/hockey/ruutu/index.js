@@ -13,13 +13,14 @@ const parser = async (browser, name, limit, day, league) => {
 
     const matches = await getMatches(token, date, name, league);
 
+    console.log(matches);
+
     return matches.map((match) => ({
         ...match,
-        scrapedDate: day,
-        parserName: name,
-    }))
+        parserName: name
+    }));
 };
 
 module.exports = {
-    parser,
+    parser
 };

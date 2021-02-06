@@ -1,7 +1,8 @@
 const path = require('path');
 const ipc = require('node-ipc');
+// eslint-disable-next-line import/no-unresolved
 const { Worker, isMainThread } = require('worker_threads');
-const { printHeader, queue } = require('./src/utils');
+const { printHeader, queue, Logger } = require('./src/utils');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./src/constants');
@@ -10,9 +11,8 @@ ipc.config.id = MAIN_PROCESS;
 ipc.config.retry = 1500;
 ipc.config.silent = true;
 
-ipc.serve(() => ipc.server.on(PROCESS_CHANEL, jobName => {
-    console.log(jobName);
-    queue.onComplete(jobName)
+ipc.serve(() => ipc.server.on(PROCESS_CHANEL, (jobName) => {
+    queue.onComplete(jobName);
 }));
 
 ipc.server.start();
@@ -21,6 +21,7 @@ const filename = path.join(__dirname, 'src', 'startScraping.js');
 
 let error = null;
 
+// eslint-disable-next-line consistent-return
 const parsers = async () => {
     printHeader();
     if (error) console.log(error);
@@ -31,28 +32,27 @@ const parsers = async () => {
         switch (choice) {
             case 'Использовать парсеры': {
                 const { day, parsersList } = await getQuestions();
+                const logger = new Logger();
                 const globalMatches = [];
 
                 if (isMainThread) {
-                    await Promise.all(parsersList.map((parserName) => {
-                        return new Promise((resolve, reject) => {
-                            const worker = new Worker(
-                                filename,
-                                { workerData: { day, parserName } }
-                            );
-                            worker.on('error', (err) => reject(err));
-                            worker.on('message', ({ matches }) => {
-                                if (!matches) return;
-                                console.log(matches);
-                                globalMatches.push(...matches);
-                                resolve();
-                            });
+                    await Promise.all(parsersList.map((parserName) => new Promise((resolve, reject) => {
+                        const worker = new Worker(
+                            filename,
+                            { workerData: { day, parserName } }
+                        );
+                        worker.on('error', (err) => reject(err));
+                        worker.on('message', ({ matches }) => {
+                            if (!matches) return;
+                            globalMatches.push(...matches);
+                            resolve();
                         });
-                    }));
+                    })));
                 }
                 error = null;
 
                 queue.push(globalMatches);
+                logger.success();
                 return parsers();
             }
             case 'Скачать матч ydl': {
@@ -63,7 +63,7 @@ const parsers = async () => {
                     name,
                     options,
                     scrapedDate: new Date(),
-                    parserName: 'RANDOM',
+                    parserName: 'RANDOM'
                 });
                 return parsers();
             }
@@ -74,7 +74,7 @@ const parsers = async () => {
                     url,
                     name: `${id}`,
                     scrapedDate: new Date(),
-                    parserName: 'RANDOM',
+                    parserName: 'RANDOM'
                 })));
 
                 return parsers();
@@ -83,15 +83,15 @@ const parsers = async () => {
                 console.log('Выход!');
                 process.kill(process.pid);
                 break;
-
             }
         }
     }
     catch (e) {
         error = e;
         console.log(error);
-        parsers().catch(e => console.log(e));
+        // eslint-disable-next-line no-shadow
+        parsers().catch((e) => console.log(e));
     }
 };
 
-parsers().catch(e => console.log(e));
+parsers().catch((e) => console.log(e));

@@ -9,9 +9,9 @@ const startScraping = async () => {
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--start-maximized',
+            '--start-maximized'
         ],
-        headless: true,
+        headless: true
     });
     const [scraperName, league] = parserName.split('-');
     const sportName = getSportNameByParserName(parserName);
@@ -22,7 +22,7 @@ const startScraping = async () => {
 
     await browser.close();
 
-    parentPort.postMessage({ matches })
+    parentPort.postMessage({ matches });
 };
 
-startScraping().catch(e => console.log(e));
+startScraping().catch((e) => console.log(e));
