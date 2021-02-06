@@ -1,20 +1,24 @@
 const ipc = require('node-ipc');
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./constants');
 const { sendTelegramMessage } = require('./telegramBot');
-const { formatDate, runCmdHandler, parseArgv, getSavedName } = require('./utils');
+const { runCmdHandler, parseArgv, getSavedName } = require('./utils');
+const { JSONMatches } = require('./utils/readFile');
 
 ipc.config.id = `${process.pid}`;
 ipc.config.retry = 1500;
 ipc.config.silent = true;
 
 const startDownload = async () => {
-    const match = parseArgv(process.argv);
-    const {
-        name,
-        url,
-        options = '--hls-prefer-native'
-    } = match;
+    const { id } = parseArgv(process.argv);
     console.log(`This process is pid ${process.pid}`);
+
+    const matches = JSONMatches.read('../');
+    const match = matches[id];
+    const {
+        options,
+        name,
+        url
+    } = match;
 
     const matchName = name.replace(/ /g, '');
 
