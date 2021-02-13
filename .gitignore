@@ -1,4 +1,5 @@
 node_modules
 package-lock.json
+matches.json
 creds.json
 src/youtube-dl/*

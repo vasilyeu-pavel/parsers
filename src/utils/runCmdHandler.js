@@ -33,7 +33,6 @@ const runCmdHandler = async (dir, cmd) => {
                 }
             });
             process.on('exit', (code, signal) => {
-                console.log('finish ---> resolve', code, signal);
                 isRetry = false;
                 resolve('true');
             });
