@@ -2,7 +2,7 @@ const readline = require('readline');
 const abort = require('./abort')
 const params = require('./params')
 
-const symbols = ['◐', '◓', '◑', '◒']
+const symbols = ['|', '/', '-', '\\']
 
 class Logger {
     constructor (message) {
@@ -40,7 +40,7 @@ class Logger {
         !params.silent && readline.cursorTo(process.stdout, 0)
         const symbol = params.silent ? '*x§' : symbols[this.symbolIndex]
         const successSymbol = params.silent ? '[DONE]' : '✔'
-        process.stdout.write(`${succeeded ? successSymbol : symbol}   ${this.message || ''}`)
+        process.stdout.write(`${succeeded ? successSymbol : symbol}   ${this.message || 'Loading...'}`)
     }
 }
 

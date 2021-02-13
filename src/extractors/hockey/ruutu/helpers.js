@@ -1,7 +1,12 @@
 const { URL, URLSearchParams } = require('url');
 const fetch = require('node-fetch');
 const jsdom = require('jsdom');
-const { auth, getCookies, cookiesParser } = require('../../../utils');
+const {
+    auth,
+    getCookies,
+    cookiesParser,
+    delay,
+} = require('../../../utils');
 const config = require('../../../../config');
 
 const getAuthToken = async (
@@ -81,6 +86,7 @@ const requestFromManifest = async (gatling_token, match) => {
     const timestamp = `timestamp=${new Date().getTime()}`;
 
     return {
+        // eslint-disable-next-line camelcase,max-len
         url: `https://gatling.nelonenmedia.fi/auth/access/v2?stream=${manifest.split('/').join('%2f')}&${timestamp}&${gatling_token}`,
         ...match
     };
@@ -126,9 +132,9 @@ const getMatches = async (gatling_token = 'gatling_token', d = convertDate(new D
     const matchesToDownload = [];
 
     for (const { url, ...matchOptions } of filteredReslut) {
-        const manifestWithToken = await fetch(url);
+        const manifestWithToken = await fetch(`${url}`);
         const urlWithToken = await manifestWithToken.text();
-        await new Promise((res) => setTimeout(() => res(true), 2000));
+        await delay(2000);
 
         matchesToDownload.push({
             ...matchOptions,

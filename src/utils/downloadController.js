@@ -17,6 +17,8 @@ const download = async (match) => {
 
     const options = Object.keys(match).map((key) => `${key}=${match[key]}`).join(' ');
 
+    if (!match.url || (match.url && !match.url.length)) return;
+
     if (!isDownloading(savedName)) {
         runCmdHandler(
             '/parsers/src/',
