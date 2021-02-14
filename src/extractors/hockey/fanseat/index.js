@@ -10,9 +10,9 @@ const TOKEN = 'x-staylive-token';
 
 const getMatchList = async ({ selectedDate, parserName, token }) => {
     try {
-        const res = await fetch('https://api.staylive.tv/videos/feed?limit=100&page=1', {
+        const res = await fetch('https://api.staylive.tv/videos/feed?limit=100&page=1&categories=false', {
             headers: {
-                'x-staylive-channels': '1905,1906,1907,1908,1909,1910,1911,1912,1913,1914,1918,1919,1970'
+                'x-staylive-channels': '1905,1906,1907,1908,1909,1910,1911,1912,1913,1914,1918,1919,1970,2382,2596'
             }
         });
         const { message } = await res.json();
