@@ -12,19 +12,26 @@ const startDownload = async () => {
     const { id } = parseArgv(process.argv);
     console.log(`This process is pid ${process.pid}`);
 
+    if (!id) throw new Error('id is not defined');
+
     const matches = JSONMatches.read('../');
     const match = matches[id];
+
+    if (!match) throw new Error('match is not found');
+
     const {
-        options,
+        options = '--hls-prefer-native_--cookies_cookies.txt',
         name,
         url
     } = match;
+
+    if (!url) throw new Error('url is not defined');
 
     const matchName = name.replace(/ /g, '');
 
     const savedName = getSavedName(match);
 
-    const ydlCmd = `youtube-dl ${options.split('_').join(' ')} ${url} --output ${savedName}`;
+    const ydlCmd = `youtube-dl ${options.split('_').join(' ')} "${url}" --output ${savedName}`;
 
     await runCmdHandler('/parsers/src/youtube-dl', ydlCmd);
 

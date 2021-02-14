@@ -8,7 +8,7 @@ const spawnProcess = (dir, cmd) => {
         : spawnLinuxProcess(dir, cmd));
 };
 
-const spawnWindowsProcess = (dir, cmd) => spawn('cmd.exe', ['/c', cmd], { cwd: dir });
+const spawnWindowsProcess = (dir, cmd) => spawn('cmd.exe', ['/c', ...cmd.split(' ')], { cwd: dir, windowsVerbatimArguments: true });
 
 const spawnLinuxProcess = (dir, cmd) => {
     const cmdParts = cmd.split(/\s+/);
