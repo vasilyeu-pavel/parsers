@@ -1,28 +1,37 @@
 const ipc = require('node-ipc');
 const { MAIN_PROCESS, PROCESS_CHANEL } = require('./constants');
 const { sendTelegramMessage } = require('./telegramBot');
-const { formatDate, runCmdHandler, parseArgv } = require('./utils');
+const { runCmdHandler, parseArgv, getSavedName } = require('./utils');
+const { JSONMatches } = require('./utils/readFile');
 
 ipc.config.id = `${process.pid}`;
 ipc.config.retry = 1500;
 ipc.config.silent = true;
 
 const startDownload = async () => {
-    const match = parseArgv(process.argv);
-    const {
-        name,
-        url,
-        date,
-        league,
-        options = '--hls-prefer-native',
-    } = match;
+    const { id } = parseArgv(process.argv);
     console.log(`This process is pid ${process.pid}`);
+
+    if (!id) throw new Error('id is not defined');
+
+    const matches = JSONMatches.read('../');
+    const match = matches[id];
+
+    if (!match) throw new Error('match is not found');
+
+    const {
+        options = '--hls-prefer-native_--cookies_cookies.txt',
+        name,
+        url
+    } = match;
+
+    if (!url) throw new Error('url is not defined');
 
     const matchName = name.replace(/ /g, '');
 
-    const savedName = `${league}/${formatDate(date)}_${matchName}.mp4`;
+    const savedName = getSavedName(match);
 
-    const ydlCmd = `youtube-dl ${options} ${url} --output ${savedName}`;
+    const ydlCmd = `youtube-dl ${options.split('_').join(' ')} "${url}" --output ${savedName}`;
 
     await runCmdHandler('/parsers/src/youtube-dl', ydlCmd);
 
