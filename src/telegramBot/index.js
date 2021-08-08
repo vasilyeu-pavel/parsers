@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
 const config = {
-    token: '649626996:AAHuIMPw2xLUEgAoQgO6nM-v9rcwlQTVlEI',
+    token: '1623315026:AAGJF_vfZVKWG0PqdBQXg8Dn-rvbO9ZwNlk',
     chatId: 405898308
 };
 

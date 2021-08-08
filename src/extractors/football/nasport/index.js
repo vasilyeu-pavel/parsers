@@ -4,8 +4,9 @@ const moment = require('moment-timezone');
 const config = require('../../../../config');
 
 const getEventList = async (id, day) => {
-    const res = await fetch(`https://services.api.no/api/hjallis/v2/front?sport=${id}`);
-    const { entities: { events } } = await res.json();
+    const res = await fetch(`https://direktesport.no/api/hjallis/v2/searchForEvents?sportId=${id}&count=100`);
+    const response = await res.json();
+    const { pastEvents: { events } } = response;
     if (!events || !Object.values(events).length) return;
 
     const eventList = Object.values(events)
@@ -84,6 +85,8 @@ const controller = async ({ id }, day, name) => await getUrls(id, day, name);
 
 const parser = async (browser, name, limit, day) => {
     const { sports } = config[name];
+
+    console.log(sports)
 
     for (const sport of sports) {
         return await controller(sport, day, name);
