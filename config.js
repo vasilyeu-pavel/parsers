@@ -66,7 +66,8 @@ module.exports = {
                     '713a9375-e41a-4ff8-abe8-78392c604858': 'PostNord-ligaen avd 1',
                     HXxyrXcCJqTr9Q2ghyCaf7: 'PostNord-ligaen avd 2',
 
-                    'f59f5758-d9f6-40a0-9c81-219b25b68732': 'friendly match'
+                    'f59f5758-d9f6-40a0-9c81-219b25b68732': 'friendly match',
+                    '44b64ef5-5601-4f7c-9fbd-86cfc631c2c7': '1. divisjon kvinner'
                 }
             }
         ]
