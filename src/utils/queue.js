@@ -21,6 +21,14 @@ class Queue {
         this.start()
     };
 
+    getQueueLength = () => {
+        return Object.keys(this.queues).length
+    };
+
+    getFullQueue = () => {
+        return Object.keys(this.queues)
+    };
+
     runJob = (pendingJobName) => {
         const job = this.queues[pendingJobName];
 

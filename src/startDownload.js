@@ -1,11 +1,11 @@
 const ipc = require('node-ipc');
-const { MAIN_PROCESS, PROCESS_CHANEL } = require('./constants');
+const { MAIN_PROCESS, PROCESS_CHANEL, RETRY } = require('./constants');
 const { sendTelegramMessage } = require('./telegramBot');
 const { runCmdHandler, parseArgv, getSavedName } = require('./utils');
 const { JSONMatches } = require('./utils/readFile');
 
 ipc.config.id = `${process.pid}`;
-ipc.config.retry = 1500;
+ipc.config.retry = RETRY;
 ipc.config.silent = true;
 
 const startDownload = async () => {

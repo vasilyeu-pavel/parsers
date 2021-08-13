@@ -8,8 +8,11 @@ const PROCESS_CHANEL = 'process-chanel';
 
 const MAX_PARALLEL_RUN_PROCESS = cpuCount;
 
+const RETRY = 1500;
+
 module.exports = {
     MAIN_PROCESS,
     PROCESS_CHANEL,
-    MAX_PARALLEL_RUN_PROCESS
+    MAX_PARALLEL_RUN_PROCESS,
+    RETRY,
 };

@@ -5,10 +5,11 @@ const { Worker, isMainThread } = require('worker_threads');
 const { printHeader, queue, Logger } = require('./src/utils');
 const { getQuestions, selectMode, questionsForDownloadSimpleMatch } = require('./src/questions');
 const { customsData } = require('./src/customsData');
-const { MAIN_PROCESS, PROCESS_CHANEL } = require('./src/constants');
+const { MAIN_PROCESS, PROCESS_CHANEL, RETRY } = require('./src/constants');
+const { sendCustomTelegrammMessage } = require('./src/telegramBot');
 
 ipc.config.id = MAIN_PROCESS;
-ipc.config.retry = 1500;
+ipc.config.retry = RETRY;
 ipc.config.silent = true;
 
 ipc.serve(() => ipc.server.on(PROCESS_CHANEL, (jobName) => {
@@ -77,6 +78,14 @@ const parsers = async () => {
                     parserName: 'RANDOM'
                 })));
 
+                return parsers();
+            }
+            case 'Кол-во матчей в очереди': {
+                await sendCustomTelegrammMessage(`Матчей в очереди - ${queue.getQueueLength()}`);
+                return parsers();
+            }
+            case 'Показать всю очередь': {
+                await sendCustomTelegrammMessage(`Матчи в очереди: ${"\n" + queue.getFullQueue().join("\n")}`);
                 return parsers();
             }
             case 'Выход!': {

@@ -21,4 +21,12 @@ const sendTelegramMessage = async (message) => {
     return await bot.sendMessage(config.chatId, messages, { parse_mode: "markdown" });
 };
 
-module.exports = { sendTelegramMessage };
+const sendCustomTelegrammMessage = async (message) => {
+    return await bot.sendMessage(
+        config.chatId,
+        message.replace(/,/g, ''),
+        { parse_mode: "markdown" }
+        );
+};
+
+module.exports = { sendTelegramMessage, sendCustomTelegrammMessage };
