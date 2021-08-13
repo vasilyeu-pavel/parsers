@@ -85,7 +85,7 @@ const parsers = async () => {
                 return parsers();
             }
             case 'Показать всю очередь': {
-                await sendCustomTelegrammMessage(`Матчи в очереди: ${"\n" + queue.getFullQueue().join("\n")}`);
+                await sendCustomTelegrammMessage(`Матчи в очереди: ${"\n" + queue.getFullProgressJob()}`);
                 return parsers();
             }
             case 'Выход!': {

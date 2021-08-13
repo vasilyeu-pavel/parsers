@@ -1,6 +1,11 @@
 const download = require('./downloadController');
 const chunkArray = require('./chunkArray');
-const { MAX_PARALLEL_RUN_PROCESS } = require('../constants');
+const {
+    MAX_PARALLEL_RUN_PROCESS,
+    PENDING,
+    PROGRESS,
+    DONE,
+} = require('../constants');
 
 class Queue {
     constructor() {
@@ -11,11 +16,11 @@ class Queue {
         if (Array.isArray(jobs)) {
             jobs.forEach(job => {
                 if (!job.name) throw new Error('name is not defined in job');
-                this.queues[job.name] = { ...job, status: 'PENDING' };
+                this.queues[job.name] = { ...job, status: PENDING };
             });
         } else {
             if (!jobs.name) throw new Error('name is not defined in job');
-            this.queues[jobs.name] = { ...jobs, status: 'PENDING' }
+            this.queues[jobs.name] = { ...jobs, status: PENDING }
         }
 
         this.start()
@@ -25,15 +30,19 @@ class Queue {
         return Object.keys(this.queues).length
     };
 
-    getFullQueue = () => {
-        return Object.keys(this.queues)
+    getFullProgressJob = () => {
+        const queues = Object.keys(this.queues);
+        if (queues && queues.length) {
+            return Object.keys(this.queues).filter(({ status }) => status === PROGRESS).join("\n")
+        }
+        return "Нет матчей в очереди"
     };
 
     runJob = (pendingJobName) => {
         const job = this.queues[pendingJobName];
 
         if (job) {
-            this.queues[pendingJobName].status = 'PROGRESS';
+            this.queues[pendingJobName].status = PROGRESS;
 
             download(this.queues[pendingJobName]);
         }
@@ -44,7 +53,7 @@ class Queue {
 
         const jobsName = Object.keys(this.queues);
 
-        const progress = jobsName.filter((name) => this.queues[name].status === 'PROGRESS');
+        const progress = jobsName.filter((name) => this.queues[name].status === PROGRESS);
 
         if (progress.length >= MAX_PARALLEL_RUN_PROCESS) return;
 
@@ -52,7 +61,7 @@ class Queue {
             threadsCount =  MAX_PARALLEL_RUN_PROCESS - progress.length
         }
 
-        const pendingJobsNames = jobsName.filter((name) => this.queues[name].status === 'PENDING');
+        const pendingJobsNames = jobsName.filter((name) => this.queues[name].status === PENDING);
         if (!pendingJobsNames || !pendingJobsNames.length) return;
 
         const [chunk] = chunkArray(pendingJobsNames, threadsCount);
@@ -64,7 +73,7 @@ class Queue {
     onComplete = async (name) => {
         const job = this.queues[name];
         if (!job) return;
-        this.queues[name].status = 'DONE';
+        this.queues[name].status = DONE;
         this.start();
     }
 }

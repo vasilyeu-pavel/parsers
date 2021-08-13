@@ -10,9 +10,16 @@ const MAX_PARALLEL_RUN_PROCESS = cpuCount;
 
 const RETRY = 1500;
 
+const PENDING = 'PENDING';
+const PROGRESS = 'PROGRESS';
+const DONE = 'DONE';
+
 module.exports = {
     MAIN_PROCESS,
     PROCESS_CHANEL,
     MAX_PARALLEL_RUN_PROCESS,
     RETRY,
+    PENDING,
+    PROGRESS,
+    DONE,
 };
